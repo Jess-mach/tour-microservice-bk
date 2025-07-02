@@ -1,4 +1,4 @@
-package br.com.tourapp.controller;
+package br.com.tourapp.tourapp.controller;
 
 import br.com.tourapp.dto.request.CadastroClienteRequest;
 import br.com.tourapp.dto.request.CadastroOrganizadorRequest;

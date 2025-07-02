@@ -4,6 +4,7 @@ import br.com.tourapp.dto.request.TokenRefreshRequest;
 import br.com.tourapp.dto.response.JwtResponse;
 import br.com.tourapp.dto.response.TokenRefreshResponse;
 import br.com.tourapp.dto.response.UserInfoResponse;
+import br.com.tourapp.security.SecurityUser;
 import br.com.tourapp.service.AuthenticationUseCase;
 import br.com.tourapp.service.RefreshTokenUseCase;
 import br.com.tourapp.service.UserUseCase;
@@ -14,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -80,22 +80,22 @@ public class AuthController {
 
     @PostMapping("/logout")
     @Operation(summary = "Logout", description = "Invalida o refresh token do usuário")
-    public ResponseEntity<Map<String, String>> logoutUser(@AuthenticationPrincipal UserDetails userDetails) {
-        refreshTokenService.deleteByUserEmail(userDetails.getUsername());
+    public ResponseEntity<Map<String, String>> logoutUser(@AuthenticationPrincipal SecurityUser securityUser) {
+        refreshTokenService.deleteByUserEmail(securityUser.getUsername());
         return ResponseEntity.ok(Map.of("message", "Log out bem-sucedido!"));
     }
 
     @GetMapping("/me")
     @Operation(summary = "Obter informações do usuário", description = "Retorna as informações do usuário autenticado")
-    public ResponseEntity<UserInfoResponse> getUserInfo(@AuthenticationPrincipal UserDetails userDetails) {
-        UserInfoResponse userInfoResponse = userService.getUserInfo(userDetails.getUsername());
+    public ResponseEntity<UserInfoResponse> getUserInfo(@AuthenticationPrincipal SecurityUser securityUser) {
+        UserInfoResponse userInfoResponse = userService.getUserInfo(securityUser.getUsername());
         return ResponseEntity.ok(userInfoResponse);
     }
 
     @GetMapping("/check-subscription")
     @Operation(summary = "Verificar assinatura", description = "Verifica se o usuário possui uma assinatura ativa")
-    public ResponseEntity<Map<String, Object>> checkSubscription(@AuthenticationPrincipal UserDetails userDetails) {
-        Map<String, Object> subscriptionInfo = userService.checkSubscription(userDetails.getUsername());
+    public ResponseEntity<Map<String, Object>> checkSubscription(@AuthenticationPrincipal SecurityUser securityUser) {
+        Map<String, Object> subscriptionInfo = userService.checkSubscription(securityUser.getUsername());
         return ResponseEntity.ok(subscriptionInfo);
     }
 

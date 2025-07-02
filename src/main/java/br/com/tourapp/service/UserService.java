@@ -7,6 +7,7 @@ import br.com.tourapp.dto.response.UserInfoResponse;
 import br.com.tourapp.entity.RoleEntity;
 import br.com.tourapp.repository.RoleRepository;
 import br.com.tourapp.repository.UserRepository;
+import br.com.tourapp.security.SecurityUser;
 import br.com.tourapp.util.JwtUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,11 +44,11 @@ public class UserService implements UserUseCase {
     }
 
     /**
-     * Método para processar Google ID Token e retornar usuário e UserDetails
+     * Método para processar Google ID Token e retornar usuário e SecurityUser
      * CORRIGIDO: Remove dependência de RefreshTokenService para evitar circulação
      */
     @Transactional
-    public Pair<UserEntity, UserDetails> processGoogleToken(String googleIdToken) {
+    public Pair<UserEntity, SecurityUser> processGoogleToken(String googleIdToken) {
         logger.info("Processando Google ID Token");
 
         // Validar o Google ID Token usando GoogleTokenVerifier
@@ -62,7 +63,7 @@ public class UserService implements UserUseCase {
         // Criar ou atualizar usuário
         UserEntity user = findOrCreateUser(googleUserInfo);
 
-        // Criar UserDetails para o usuário
+        // Criar SecurityUser para o usuário
         List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toList());
@@ -73,16 +74,16 @@ public class UserService implements UserUseCase {
                 .authorities(authorities)
                 .build();
 
-        logger.info("UserDetails criado com sucesso para: {}", user.getEmail());
-        return new Pair<>(user, userDetails);
+        logger.info("SecurityUser criado com sucesso para: {}", user.getEmail());
+        return new Pair<>(user, (SecurityUser) userDetails);
     }
 
     /**
      * Gera token JWT INTERNO da aplicação (não confundir com Google ID Token)
      */
-    public String generateAccessToken(UserDetails userDetails) {
-        logger.debug("Gerando token de acesso interno para: {}", userDetails.getUsername());
-        return jwtUtils.generateJwtToken(userDetails);
+    public String generateAccessToken(SecurityUser securityUser) {
+        logger.debug("Gerando token de acesso interno para: {}", securityUser.getUsername());
+        return jwtUtils.generateJwtToken(securityUser);
     }
 
     /**
@@ -145,7 +146,7 @@ public class UserService implements UserUseCase {
     }
 
     @Override
-    public UserDetails loadUserDetailsByEmail(String email) {
+    public SecurityUser loadSecurityUserByEmail(String email) {
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado com o email: " + email));
 
@@ -153,7 +154,7 @@ public class UserService implements UserUseCase {
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toList());
 
-        return org.springframework.security.core.userdetails.User
+        return (SecurityUser) org.springframework.security.core.userdetails.User
                 .withUsername(user.getEmail())
                 .password("")
                 .authorities(authorities)

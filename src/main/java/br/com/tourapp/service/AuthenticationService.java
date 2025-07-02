@@ -3,7 +3,7 @@ package br.com.tourapp.service;
 import br.com.tourapp.dto.response.JwtResponse;
 import br.com.tourapp.dto.response.TokenRefreshResponse;
 import br.com.tourapp.entity.RefreshTokenEntity;
-import org.springframework.security.core.userdetails.UserDetails;
+import br.com.tourapp.security.SecurityUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +26,7 @@ public class AuthenticationService implements AuthenticationUseCase{
     @Transactional
     public JwtResponse authenticateWithGoogle(String googleToken) {
         // Obter informações do usuário
-        UserService.Pair<UserEntity, UserDetails> userInfo = userService.processGoogleToken(googleToken);
+        UserService.Pair<UserEntity, SecurityUser> userInfo = userService.processGoogleToken(googleToken);
 
         // Gerar tokens JWT
         String accessToken = userService.generateAccessToken(userInfo.getSecond());
@@ -53,10 +53,10 @@ public class AuthenticationService implements AuthenticationUseCase{
         RefreshTokenEntity tokenEntity = refreshTokenService.findAndValidateToken(refreshToken);
 
         // Obter detalhes do usuário
-        UserDetails userDetails = userService.loadUserDetailsByEmail(tokenEntity.getUserEmail());
+        SecurityUser securityUser = userService.loadSecurityUserByEmail(tokenEntity.getUserEmail());
 
         // Gerar novo token de acesso
-        String newAccessToken = userService.generateAccessToken(userDetails);
+        String newAccessToken = userService.generateAccessToken(securityUser);
 
         // Retornar resposta
         return new TokenRefreshResponse(

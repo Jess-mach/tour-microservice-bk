@@ -2,6 +2,7 @@ package br.com.tourapp.controller;
 
 import br.com.tourapp.dto.TourDTO;
 import br.com.tourapp.entity.Tour;
+import br.com.tourapp.security.SecurityUser;
 import br.com.tourapp.service.TourService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,7 +20,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -74,7 +74,7 @@ public class TourController {
             @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "Sort by field") @RequestParam(defaultValue = "createdAt") String sortBy,
             @Parameter(description = "Sort direction") @RequestParam(defaultValue = "desc") String sortDir,
-            @AuthenticationPrincipal UserDetails userDetails ) {
+            @AuthenticationPrincipal SecurityUser securityUser ) {
 
         log.info("GET /api/v1/tours - Fetching tours, page: {}, size: {}", page, size);
 

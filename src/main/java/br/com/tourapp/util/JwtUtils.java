@@ -1,5 +1,6 @@
 package br.com.tourapp.util;
 
+import br.com.tourapp.security.SecurityUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -8,7 +9,6 @@ import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -41,11 +41,11 @@ public class JwtUtils {
     /**
      * Gera um token JWT INTERNO da aplicação (não confundir com Google ID Token)
      */
-    public String generateJwtToken(UserDetails userDetails) {
-        logger.debug("Gerando token JWT interno para usuário: {}", userDetails.getUsername());
+    public String generateJwtToken(SecurityUser securityUser) {
+        logger.debug("Gerando token JWT interno para usuário: {}", securityUser.getUsername());
 
         return Jwts.builder()
-                .setSubject(userDetails.getUsername())
+                .setSubject(securityUser.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(secretKey, SignatureAlgorithm.HS512)
@@ -55,11 +55,11 @@ public class JwtUtils {
     /**
      * Gera um refresh token INTERNO da aplicação
      */
-    public String generateRefreshToken(UserDetails userDetails) {
-        logger.debug("Gerando refresh token interno para usuário: {}", userDetails.getUsername());
+    public String generateRefreshToken(SecurityUser securityUser) {
+        logger.debug("Gerando refresh token interno para usuário: {}", securityUser.getUsername());
 
         return Jwts.builder()
-                .setSubject(userDetails.getUsername())
+                .setSubject(securityUser.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + refreshExpirationMs))
                 .signWith(secretKey, SignatureAlgorithm.HS512)

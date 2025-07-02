@@ -1,12 +1,13 @@
 package br.com.tourapp.config.security;
 
-import com.tourapp.service.UserDetailsProvider;
-import com.tourapp.util.JwtUtils;
+
+import br.com.tourapp.security.SecurityUser;
+import br.com.tourapp.service.UserDetailsProvider;
+import br.com.tourapp.util.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -40,9 +41,9 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String email = (String) oAuth2User.getAttributes().get("email");
 
-        // Carregando UserDetails para gerar o token JWT
-        UserDetails userDetails = userDetailsProvider.loadUserByUsername(email);
-        String token = jwtUtils.generateJwtToken(userDetails);
+        // Carregando SecurityUser para gerar o token JWT
+        SecurityUser securityUser = userDetailsProvider.loadUserByUsername(email);
+        String token = jwtUtils.generateJwtToken(securityUser);
 
         // Construindo a URL de redirecionamento com o token
         String targetUrl = UriComponentsBuilder.fromUriString(redirectUri)

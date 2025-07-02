@@ -1,7 +1,9 @@
 package br.com.tourapp.service;
 
 import br.com.tourapp.repository.UserRepository;
+import br.com.tourapp.security.SecurityUser;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -20,7 +22,7 @@ public class UserDetailsServiceImpl implements UserDetailsProvider {
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public SecurityUser loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado com o email: " + username));
 
@@ -28,7 +30,7 @@ public class UserDetailsServiceImpl implements UserDetailsProvider {
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toList());
 
-        return org.springframework.security.core.userdetails.User.builder()
+        UserDetails build = User.builder()
                 .username(user.getEmail())
                 .password("") // Não precisamos de senha com autenticação OAuth2
                 .authorities(authorities)
@@ -37,5 +39,7 @@ public class UserDetailsServiceImpl implements UserDetailsProvider {
                 .credentialsExpired(false)
                 .disabled(!user.isActive())
                 .build();
+
+        return (SecurityUser) build;
     }
 }

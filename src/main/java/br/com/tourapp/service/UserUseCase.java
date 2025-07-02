@@ -2,12 +2,12 @@ package br.com.tourapp.service;
 
 import br.com.tourapp.dto.response.JwtResponse;
 import br.com.tourapp.dto.response.UserInfoResponse;
-import org.springframework.security.core.userdetails.UserDetails;
+import br.com.tourapp.security.SecurityUser;
 
 import java.util.Map;
 
 public interface UserUseCase {
-    UserDetails loadUserDetailsByEmail(String email);
+    SecurityUser loadSecurityUserByEmail(String email);
 
     UserInfoResponse getUserInfo(String username);
 
@@ -15,7 +15,7 @@ public interface UserUseCase {
 
     void updateSubscription(String email, String plan, int months);
 
-    UserService.Pair<UserEntity, UserDetails> processGoogleToken(String googleToken);
+    UserService.Pair<UserEntity, SecurityUser> processGoogleToken(String googleToken);
 
     JwtResponse buildJwtResponse(UserEntity user, String accessToken, String token);
 }

@@ -4,9 +4,9 @@ package br.com.tourapp.service;
 import br.com.tourapp.entity.RefreshTokenEntity;
 import br.com.tourapp.exception.TokenRefreshException;
 import br.com.tourapp.repository.RefreshTokenRepository;
+import br.com.tourapp.security.SecurityUser;
 import br.com.tourapp.util.JwtUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,8 +27,8 @@ public class RefreshTokenService implements RefreshTokenUseCase{
         this.jwtUtils = jwtUtils;
     }
 
-    public RefreshTokenEntity createRefreshToken(String userEmail, UserDetails userDetails) {
-        String token = jwtUtils.generateRefreshToken(userDetails);
+    public RefreshTokenEntity createRefreshToken(String userEmail, SecurityUser securityUser) {
+        String token = jwtUtils.generateRefreshToken(securityUser);
 
         RefreshTokenEntity refreshToken = new RefreshTokenEntity(
                 token,

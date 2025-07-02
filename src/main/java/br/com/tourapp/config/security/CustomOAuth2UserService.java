@@ -1,9 +1,9 @@
 package br.com.tourapp.config.security;
 
-import com.tourapp.entity.RoleEntity;
-import com.tourapp.entity.UserEntity;
-import com.tourapp.repository.RoleRepository;
-import com.tourapp.repository.UserRepository;
+import br.com.tourapp.entity.RoleEntity;
+import br.com.tourapp.service.UserEntity;
+import br.com.tourapp.repository.RoleRepository;
+import br.com.tourapp.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;

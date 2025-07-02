@@ -1,7 +1,8 @@
 package br.com.tourapp.service;
 
-import org.springframework.security.core.userdetails.UserDetails;
+
+import br.com.tourapp.security.SecurityUser;
 
 public interface UserDetailsProvider {
-    UserDetails loadUserByUsername(String email);
+    SecurityUser loadUserByUsername(String email);
 }

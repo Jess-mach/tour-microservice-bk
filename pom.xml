@@ -105,11 +105,11 @@
             <version>2.1.29</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.cloudinary/cloudinary-core -->
+        <!-- AWS S3 SDK -->
         <dependency>
-            <groupId>com.cloudinary</groupId>
-            <artifactId>cloudinary-core</artifactId>
-            <version>2.3.0</version>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <version>2.28.25</version>
         </dependency>
 
         <!-- Firebase Admin -->

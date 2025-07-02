@@ -27,16 +27,16 @@ public class ExcursaoService {
 
     private final ExcursaoRepository excursaoRepository;
     private final OrganizadorRepository organizadorRepository;
-    private final CloudinaryService cloudinaryService;
+    private final S3Service s3Service;
     private final ModelMapper modelMapper;
 
     public ExcursaoService(ExcursaoRepository excursaoRepository,
                            OrganizadorRepository organizadorRepository,
-                           CloudinaryService cloudinaryService,
+                           S3Service s3Service,
                            ModelMapper modelMapper) {
         this.excursaoRepository = excursaoRepository;
         this.organizadorRepository = organizadorRepository;
-        this.cloudinaryService = cloudinaryService;
+        this.s3Service = s3Service;
         this.modelMapper = modelMapper;
     }
 
@@ -61,7 +61,7 @@ public class ExcursaoService {
 
         // Upload de imagens
         if (request.getImagens() != null && !request.getImagens().isEmpty()) {
-            List<String> urlsImagens = cloudinaryService.uploadMultiplas(request.getImagens());
+            List<String> urlsImagens = s3Service.uploadMultiplas(request.getImagens());
             excursao.setImagens(urlsImagens);
         }
 
@@ -129,7 +129,7 @@ public class ExcursaoService {
 
         // Upload de novas imagens se fornecidas
         if (request.getImagens() != null && !request.getImagens().isEmpty()) {
-            List<String> urlsImagens = cloudinaryService.uploadMultiplas(request.getImagens());
+            List<String> urlsImagens = s3Service.uploadMultiplas(request.getImagens());
             excursao.setImagens(urlsImagens);
         }
 

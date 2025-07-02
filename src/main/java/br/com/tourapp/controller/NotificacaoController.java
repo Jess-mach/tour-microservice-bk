@@ -3,7 +3,7 @@ package br.com.tourapp.controller;
 import br.com.tourapp.dto.request.NotificacaoRequest;
 import br.com.tourapp.dto.response.NotificacaoResponse;
 import br.com.tourapp.entity.Cliente;
-import br.com.tourapp.service.NotificacaoService;
+import br.com.tourapp.service.NotificationUseCase;
 import br.com.tourapp.security.SecurityUser;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -21,9 +21,9 @@ import java.util.UUID;
 @PreAuthorize("hasRole('ORGANIZADOR')")
 public class NotificacaoController {
 
-    private final NotificacaoService notificacaoService;
+    private final NotificationUseCase notificacaoService;
 
-    public NotificacaoController(NotificacaoService notificacaoService) {
+    public NotificacaoController(NotificationUseCase notificacaoService) {
         this.notificacaoService = notificacaoService;
     }
 

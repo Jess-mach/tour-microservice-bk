@@ -3,7 +3,7 @@ package br.com.tourapp.controller;
 import br.com.tourapp.dto.request.PagamentoCartaoRequest;
 import br.com.tourapp.dto.request.PagamentoPixRequest;
 import br.com.tourapp.dto.response.PagamentoResponse;
-import br.com.tourapp.service.PagamentoService;
+import br.com.tourapp.service.PaymentUseCase;
 import br.com.tourapp.security.SecurityUser;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("hasRole('CLIENTE')")
 public class PagamentoController {
 
-    private final PagamentoService pagamentoService;
+    private final PaymentUseCase pagamentoService;
 
-    public PagamentoController(PagamentoService pagamentoService) {
+    public PagamentoController(PaymentUseCase pagamentoService) {
         this.pagamentoService = pagamentoService;
     }
 

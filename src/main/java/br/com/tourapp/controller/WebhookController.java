@@ -1,6 +1,6 @@
 package br.com.tourapp.controller;
 
-import br.com.tourapp.service.PagamentoService;
+import br.com.tourapp.service.PaymentUseCase;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,9 +11,9 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class WebhookController {
 
-    private final PagamentoService pagamentoService;
+    private final PaymentUseCase pagamentoService;
 
-    public WebhookController(PagamentoService pagamentoService) {
+    public WebhookController(PaymentUseCase pagamentoService) {
         this.pagamentoService = pagamentoService;
     }
 

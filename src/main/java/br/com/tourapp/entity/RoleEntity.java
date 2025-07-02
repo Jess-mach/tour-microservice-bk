@@ -1,6 +1,5 @@
 package br.com.tourapp.entity;
 
-import br.com.tourapp.service.UserEntity;
 import jakarta.persistence.*;
 
 import java.util.HashSet;

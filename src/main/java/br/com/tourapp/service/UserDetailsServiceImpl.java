@@ -1,5 +1,6 @@
 package br.com.tourapp.service;
 
+import br.com.tourapp.entity.UserEntity;
 import br.com.tourapp.repository.UserRepository;
 import br.com.tourapp.security.SecurityUser;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

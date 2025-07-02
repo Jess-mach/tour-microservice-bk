@@ -2,7 +2,7 @@ package br.com.tourapp.service;
 
 
 import br.com.tourapp.dto.TourDTO;
-import br.com.tourapp.entity.Tour;
+import br.com.tourapp.entity.TourEntity;
 import br.com.tourapp.exception.DuplicateResourceException;
 import br.com.tourapp.exception.ResourceNotFoundException;
 import br.com.tourapp.repository.TourRepository;
@@ -33,8 +33,8 @@ public class TourService {
             throw new DuplicateResourceException("Tour with name '" + request.getName() + "' already exists");
         }
 
-        Tour tour = mapToEntity(request);
-        Tour savedTour = tourRepository.save(tour);
+        TourEntity tour = mapToEntity(request);
+        TourEntity savedTour = tourRepository.save(tour);
 
         log.info("Tour created successfully with ID: {}", savedTour.getId());
         return mapToResponse(savedTour);
@@ -44,7 +44,7 @@ public class TourService {
     public TourDTO.Response getTourById(UUID id) {
         log.info("Fetching tour with ID: {}", id);
 
-        Tour tour = tourRepository.findById(id)
+        TourEntity tour = tourRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tour not found with ID: " + id));
 
         return mapToResponse(tour);
@@ -54,7 +54,7 @@ public class TourService {
     public Page<TourDTO.Summary> getAllTours(Pageable pageable) {
         log.info("Fetching all tours with pagination: {}", pageable);
 
-        Page<Tour> tours = tourRepository.findAll(pageable);
+        Page<TourEntity> tours = tourRepository.findAll(pageable);
         return tours.map(this::mapToSummary);
     }
 
@@ -66,13 +66,13 @@ public class TourService {
             BigDecimal maxPrice,
             Integer minDays,
             Integer maxDays,
-            Tour.TourStatus status,
+            TourEntity.TourStatus status,
             Pageable pageable) {
 
         log.info("Searching tours with filters - name: {}, destination: {}, status: {}",
                 name, destination, status);
 
-        Page<Tour> tours = tourRepository.findToursWithFilters(
+        Page<TourEntity> tours = tourRepository.findToursWithFilters(
                 name, destination, minPrice, maxPrice, minDays, maxDays, status, pageable);
 
         return tours.map(this::mapToSummary);
@@ -81,7 +81,7 @@ public class TourService {
     public TourDTO.Response updateTour(UUID id, TourDTO.Request request) {
         log.info("Updating tour with ID: {}", id);
 
-        Tour existingTour = tourRepository.findById(id)
+        TourEntity existingTour = tourRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tour not found with ID: " + id));
 
         // Check if the new name conflicts with existing tours (excluding current tour)
@@ -91,7 +91,7 @@ public class TourService {
         }
 
         updateTourFields(existingTour, request);
-        Tour updatedTour = tourRepository.save(existingTour);
+        TourEntity updatedTour = tourRepository.save(existingTour);
 
         log.info("Tour updated successfully with ID: {}", updatedTour.getId());
         return mapToResponse(updatedTour);
@@ -109,10 +109,10 @@ public class TourService {
     }
 
     @Transactional(readOnly = true)
-    public Page<TourDTO.Summary> getToursByStatus(Tour.TourStatus status, Pageable pageable) {
+    public Page<TourDTO.Summary> getToursByStatus(TourEntity.TourStatus status, Pageable pageable) {
         log.info("Fetching tours with status: {}", status);
 
-        Page<Tour> tours = tourRepository.findByStatus(status, pageable);
+        Page<TourEntity> tours = tourRepository.findByStatus(status, pageable);
         return tours.map(this::mapToSummary);
     }
 
@@ -127,8 +127,8 @@ public class TourService {
     }
 
     // Mapping methods
-    private Tour mapToEntity(TourDTO.Request request) {
-        Tour tour = new Tour();
+    private TourEntity mapToEntity(TourDTO.Request request) {
+        TourEntity tour = new TourEntity();
         tour.setName(request.getName());
         tour.setDescription(request.getDescription());
         tour.setDestination(request.getDestination());
@@ -140,7 +140,7 @@ public class TourService {
         return tour;
     }
 
-    private TourDTO.Response mapToResponse(Tour tour) {
+    private TourDTO.Response mapToResponse(TourEntity tour) {
         return new TourDTO.Response(
                 tour.getId(),
                 tour.getName(),
@@ -156,7 +156,7 @@ public class TourService {
         );
     }
 
-    private TourDTO.Summary mapToSummary(Tour tour) {
+    private TourDTO.Summary mapToSummary(TourEntity tour) {
         return new TourDTO.Summary(
                 tour.getId(),
                 tour.getName(),
@@ -168,7 +168,7 @@ public class TourService {
         );
     }
 
-    private void updateTourFields(Tour tour, TourDTO.Request request) {
+    private void updateTourFields(TourEntity tour, TourDTO.Request request) {
         tour.setName(request.getName());
         tour.setDescription(request.getDescription());
         tour.setDestination(request.getDestination());

@@ -1,7 +1,7 @@
 package br.com.tourapp.controller;
 
 import br.com.tourapp.dto.TourDTO;
-import br.com.tourapp.entity.Tour;
+import br.com.tourapp.entity.TourEntity;
 import br.com.tourapp.security.SecurityUser;
 import br.com.tourapp.service.TourService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -97,7 +97,7 @@ public class TourController {
             @Parameter(description = "Maximum price") @RequestParam(required = false) BigDecimal maxPrice,
             @Parameter(description = "Minimum duration days") @RequestParam(required = false) Integer minDays,
             @Parameter(description = "Maximum duration days") @RequestParam(required = false) Integer maxDays,
-            @Parameter(description = "Tour status") @RequestParam(required = false) Tour.TourStatus status,
+            @Parameter(description = "Tour status") @RequestParam(required = false) TourEntity.TourStatus status,
             @Parameter(description = "Page number (0-based)") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "Sort by field") @RequestParam(defaultValue = "createdAt") String sortBy,
@@ -151,7 +151,7 @@ public class TourController {
             @ApiResponse(responseCode = "200", description = "Tours retrieved successfully")
     })
     public ResponseEntity<Page<TourDTO.Summary>> getToursByStatus(
-            @Parameter(description = "Tour status") @PathVariable Tour.TourStatus status,
+            @Parameter(description = "Tour status") @PathVariable TourEntity.TourStatus status,
             @Parameter(description = "Page number (0-based)") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "Sort by field") @RequestParam(defaultValue = "createdAt") String sortBy,

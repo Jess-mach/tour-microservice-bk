@@ -1,6 +1,6 @@
 package br.com.tourapp.repository;
 
-import br.com.tourapp.entity.Tour;
+import br.com.tourapp.entity.TourEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,22 +13,22 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface TourRepository extends JpaRepository<Tour, UUID> {
+public interface TourRepository extends JpaRepository<TourEntity, UUID> {
 
     // Find tours by status
-    Page<Tour> findByStatus(Tour.TourStatus status, Pageable pageable);
+    Page<TourEntity> findByStatus(TourEntity.TourStatus status, Pageable pageable);
 
     // Find tours by destination (case insensitive)
-    Page<Tour> findByDestinationContainingIgnoreCase(String destination, Pageable pageable);
+    Page<TourEntity> findByDestinationContainingIgnoreCase(String destination, Pageable pageable);
 
     // Find tours by price range
-    Page<Tour> findByPriceBetween(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable);
+    Page<TourEntity> findByPriceBetween(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable);
 
     // Find tours by duration range
-    Page<Tour> findByDurationDaysBetween(Integer minDays, Integer maxDays, Pageable pageable);
+    Page<TourEntity> findByDurationDaysBetween(Integer minDays, Integer maxDays, Pageable pageable);
 
     // Find tours by name containing (case insensitive)
-    Page<Tour> findByNameContainingIgnoreCase(String name, Pageable pageable);
+    Page<TourEntity> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
     // Complex search query
     @Query("SELECT t FROM Tour t WHERE " +
@@ -39,14 +39,14 @@ public interface TourRepository extends JpaRepository<Tour, UUID> {
             "(:minDays IS NULL OR t.durationDays >= :minDays) AND " +
             "(:maxDays IS NULL OR t.durationDays <= :maxDays) AND " +
             "(:status IS NULL OR t.status = :status)")
-    Page<Tour> findToursWithFilters(
+    Page<TourEntity> findToursWithFilters(
             @Param("name") String name,
             @Param("destination") String destination,
             @Param("minPrice") BigDecimal minPrice,
             @Param("maxPrice") BigDecimal maxPrice,
             @Param("minDays") Integer minDays,
             @Param("maxDays") Integer maxDays,
-            @Param("status") Tour.TourStatus status,
+            @Param("status") TourEntity.TourStatus status,
             Pageable pageable
     );
 
@@ -61,5 +61,5 @@ public interface TourRepository extends JpaRepository<Tour, UUID> {
     boolean existsByNameIgnoreCase(String name);
 
     // Find tours by status (list version)
-    List<Tour> findByStatusOrderByCreatedAtDesc(Tour.TourStatus status);
+    List<TourEntity> findByStatusOrderByCreatedAtDesc(TourEntity.TourStatus status);
 }

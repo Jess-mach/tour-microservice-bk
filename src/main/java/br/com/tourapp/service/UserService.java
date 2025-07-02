@@ -5,6 +5,7 @@ import br.com.tourapp.dto.GoogleUserInfo;
 import br.com.tourapp.dto.response.JwtResponse;
 import br.com.tourapp.dto.response.UserInfoResponse;
 import br.com.tourapp.entity.RoleEntity;
+import br.com.tourapp.entity.UserEntity;
 import br.com.tourapp.repository.RoleRepository;
 import br.com.tourapp.repository.UserRepository;
 import br.com.tourapp.security.SecurityUser;

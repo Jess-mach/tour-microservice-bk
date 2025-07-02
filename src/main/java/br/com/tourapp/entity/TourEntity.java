@@ -19,7 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class Tour {
+public class TourEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

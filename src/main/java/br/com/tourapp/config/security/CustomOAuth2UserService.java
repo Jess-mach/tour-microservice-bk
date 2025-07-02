@@ -1,7 +1,7 @@
 package br.com.tourapp.config.security;
 
 import br.com.tourapp.entity.RoleEntity;
-import br.com.tourapp.service.UserEntity;
+import br.com.tourapp.entity.UserEntity;
 import br.com.tourapp.repository.RoleRepository;
 import br.com.tourapp.repository.UserRepository;
 import org.slf4j.Logger;

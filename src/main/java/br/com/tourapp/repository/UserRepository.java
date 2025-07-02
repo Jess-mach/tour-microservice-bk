@@ -1,6 +1,6 @@
 package br.com.tourapp.repository;
 
-import br.com.tourapp.service.UserEntity;
+import br.com.tourapp.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

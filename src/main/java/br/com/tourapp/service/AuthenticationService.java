@@ -3,6 +3,7 @@ package br.com.tourapp.service;
 import br.com.tourapp.dto.response.JwtResponse;
 import br.com.tourapp.dto.response.TokenRefreshResponse;
 import br.com.tourapp.entity.RefreshTokenEntity;
+import br.com.tourapp.entity.UserEntity;
 import br.com.tourapp.security.SecurityUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

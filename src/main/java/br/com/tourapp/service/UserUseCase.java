@@ -2,6 +2,7 @@ package br.com.tourapp.service;
 
 import br.com.tourapp.dto.response.JwtResponse;
 import br.com.tourapp.dto.response.UserInfoResponse;
+import br.com.tourapp.entity.UserEntity;
 import br.com.tourapp.security.SecurityUser;
 
 import java.util.Map;

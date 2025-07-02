@@ -1,6 +1,5 @@
-package br.com.tourapp.service;
+package br.com.tourapp.entity;
 
-import br.com.tourapp.entity.RoleEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;

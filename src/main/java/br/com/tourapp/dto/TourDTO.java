@@ -1,6 +1,6 @@
 package br.com.tourapp.dto;
 
-import br.com.tourapp.entity.Tour;
+import br.com.tourapp.entity.TourEntity;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -42,7 +42,7 @@ public class TourDTO {
         @Max(value = 100, message = "Maximum participants cannot exceed 100")
         private Integer maxParticipants;
 
-        private Tour.TourStatus status = Tour.TourStatus.ACTIVE;
+        private TourEntity.TourStatus status = TourEntity.TourStatus.ACTIVE;
 
         @Size(max = 255, message = "Image URL cannot exceed 255 characters")
         private String imageUrl;
@@ -59,7 +59,7 @@ public class TourDTO {
         private BigDecimal price;
         private Integer durationDays;
         private Integer maxParticipants;
-        private Tour.TourStatus status;
+        private TourEntity.TourStatus status;
         private String imageUrl;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
@@ -74,7 +74,7 @@ public class TourDTO {
         private String destination;
         private BigDecimal price;
         private Integer durationDays;
-        private Tour.TourStatus status;
+        private TourEntity.TourStatus status;
         private String imageUrl;
     }
 }

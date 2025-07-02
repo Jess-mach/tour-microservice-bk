@@ -4,7 +4,7 @@ import br.com.tourapp.dto.request.TokenRefreshRequest;
 import br.com.tourapp.dto.response.JwtResponse;
 import br.com.tourapp.dto.response.TokenRefreshResponse;
 import br.com.tourapp.dto.response.UserInfoResponse;
-import br.com.tourapp.security.SecurityUser;
+import br.com.tourapp.entity.SecurityUser;
 import br.com.tourapp.service.AuthenticationUseCase;
 import br.com.tourapp.service.RefreshTokenUseCase;
 import br.com.tourapp.service.UserUseCase;

@@ -1,9 +1,6 @@
-package br.com.tourapp.security;
+package br.com.tourapp.entity;
 
-import br.com.tourapp.entity.Cliente;
-import br.com.tourapp.entity.Organizador;
 import br.com.tourapp.enums.TipoUsuario;
-import lombok.Builder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

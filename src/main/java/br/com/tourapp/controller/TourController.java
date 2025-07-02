@@ -2,7 +2,7 @@ package br.com.tourapp.controller;
 
 import br.com.tourapp.dto.TourDTO;
 import br.com.tourapp.entity.TourEntity;
-import br.com.tourapp.security.SecurityUser;
+import br.com.tourapp.entity.SecurityUser;
 import br.com.tourapp.service.TourService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

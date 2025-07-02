@@ -4,7 +4,7 @@ import br.com.tourapp.dto.request.PagamentoCartaoRequest;
 import br.com.tourapp.dto.request.PagamentoPixRequest;
 import br.com.tourapp.dto.response.PagamentoResponse;
 import br.com.tourapp.service.PaymentUseCase;
-import br.com.tourapp.security.SecurityUser;
+import br.com.tourapp.entity.SecurityUser;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -5,7 +5,7 @@ import br.com.tourapp.dto.response.InscricaoResponse;
 import br.com.tourapp.dto.response.OrganizadorResponse;
 import br.com.tourapp.service.OrganizadorService;
 import br.com.tourapp.service.InscricaoService;
-import br.com.tourapp.security.SecurityUser;
+import br.com.tourapp.entity.SecurityUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;

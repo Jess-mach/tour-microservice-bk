@@ -4,7 +4,7 @@ import br.com.tourapp.dto.response.ClienteResponse;
 import br.com.tourapp.dto.response.InscricaoResponse;
 import br.com.tourapp.service.ClienteService;
 import br.com.tourapp.service.InscricaoService;
-import br.com.tourapp.security.SecurityUser;
+import br.com.tourapp.entity.SecurityUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;

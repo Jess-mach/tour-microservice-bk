@@ -3,7 +3,7 @@ package br.com.tourapp.controller;
 import br.com.tourapp.dto.request.ExcursaoRequest;
 import br.com.tourapp.dto.response.ExcursaoResponse;
 import br.com.tourapp.enums.StatusExcursao;
-import br.com.tourapp.security.SecurityUser;
+import br.com.tourapp.entity.SecurityUser;
 import br.com.tourapp.service.ExcursaoService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;

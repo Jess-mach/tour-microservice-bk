@@ -8,7 +8,7 @@ import br.com.tourapp.entity.RoleEntity;
 import br.com.tourapp.entity.UserEntity;
 import br.com.tourapp.repository.RoleRepository;
 import br.com.tourapp.repository.UserRepository;
-import br.com.tourapp.security.SecurityUser;
+import br.com.tourapp.entity.SecurityUser;
 import br.com.tourapp.util.JwtUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

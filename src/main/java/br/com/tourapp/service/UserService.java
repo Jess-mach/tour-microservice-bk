@@ -49,7 +49,7 @@ public class UserService implements UserUseCase {
      * CORRIGIDO: Remove dependência de RefreshTokenService para evitar circulação
      */
     @Transactional
-    public Pair<UserEntity, SecurityUser> processGoogleToken(String googleIdToken) {
+    public Pair<UserEntity, UserDetails> processGoogleToken(String googleIdToken) {
         logger.info("Processando Google ID Token");
 
         // Validar o Google ID Token usando GoogleTokenVerifier
@@ -76,13 +76,13 @@ public class UserService implements UserUseCase {
                 .build();
 
         logger.info("SecurityUser criado com sucesso para: {}", user.getEmail());
-        return new Pair<>(user, (SecurityUser) userDetails);
+        return new Pair<>(user, userDetails);
     }
 
     /**
      * Gera token JWT INTERNO da aplicação (não confundir com Google ID Token)
      */
-    public String generateAccessToken(SecurityUser securityUser) {
+    public String generateAccessToken(UserDetails securityUser) {
         logger.debug("Gerando token de acesso interno para: {}", securityUser.getUsername());
         return jwtUtils.generateJwtToken(securityUser);
     }

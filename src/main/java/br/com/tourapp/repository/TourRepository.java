@@ -31,7 +31,7 @@ public interface TourRepository extends JpaRepository<TourEntity, UUID> {
     Page<TourEntity> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
     // Complex search query
-    @Query("SELECT t FROM Tour t WHERE " +
+    @Query("SELECT t FROM TourEntity t WHERE " +
             "(:name IS NULL OR LOWER(t.name) LIKE LOWER(CONCAT('%', :name, '%'))) AND " +
             "(:destination IS NULL OR LOWER(t.destination) LIKE LOWER(CONCAT('%', :destination, '%'))) AND " +
             "(:minPrice IS NULL OR t.price >= :minPrice) AND " +
@@ -51,7 +51,7 @@ public interface TourRepository extends JpaRepository<TourEntity, UUID> {
     );
 
     // Find popular destinations
-    @Query("SELECT t.destination, COUNT(t) as tourCount FROM Tour t " +
+    @Query("SELECT t.destination, COUNT(t) as tourCount FROM TourEntity t " +
             "WHERE t.status = 'ACTIVE' " +
             "GROUP BY t.destination " +
             "ORDER BY COUNT(t) DESC")

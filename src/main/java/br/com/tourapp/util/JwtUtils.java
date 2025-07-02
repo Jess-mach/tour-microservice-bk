@@ -9,6 +9,7 @@ import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -41,7 +42,7 @@ public class JwtUtils {
     /**
      * Gera um token JWT INTERNO da aplicação (não confundir com Google ID Token)
      */
-    public String generateJwtToken(SecurityUser securityUser) {
+    public String generateJwtToken(UserDetails securityUser) {
         logger.debug("Gerando token JWT interno para usuário: {}", securityUser.getUsername());
 
         return Jwts.builder()
@@ -55,7 +56,7 @@ public class JwtUtils {
     /**
      * Gera um refresh token INTERNO da aplicação
      */
-    public String generateRefreshToken(SecurityUser securityUser) {
+    public String generateRefreshToken(UserDetails securityUser) {
         logger.debug("Gerando refresh token interno para usuário: {}", securityUser.getUsername());
 
         return Jwts.builder()

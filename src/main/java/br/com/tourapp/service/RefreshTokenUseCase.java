@@ -1,12 +1,12 @@
 package br.com.tourapp.service;
 
 import br.com.tourapp.entity.RefreshTokenEntity;
-import br.com.tourapp.security.SecurityUser;
+import org.springframework.security.core.userdetails.UserDetails;
 
 public interface RefreshTokenUseCase {
     void deleteByUserEmail(String username);
 
-    RefreshTokenEntity createRefreshToken(String email, SecurityUser securityUser);
+    RefreshTokenEntity createRefreshToken(String email, UserDetails securityUser);
 
     RefreshTokenEntity findAndValidateToken(String refreshToken);
 }

@@ -76,6 +76,12 @@
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/net.lbruun.springboot/preliquibase-spring-boot-starter -->
+        <dependency>
+            <groupId>net.lbruun.springboot</groupId>
+            <artifactId>preliquibase-spring-boot-starter</artifactId>
+            <version>1.6.1</version>
+        </dependency>
 
         <!-- JWT - Versões compatíveis com JDK 21 -->
         <dependency>
@@ -266,19 +272,6 @@
                 </executions>
             </plugin>
 
-            <!-- Liquibase Plugin -->
-            <plugin>
-                <groupId>org.liquibase</groupId>
-                <artifactId>liquibase-maven-plugin</artifactId>
-                <version>4.28.0</version>
-                <configuration>
-                    <changeLogFile>src/main/resources/db/changelog/db.changelog-master.xml</changeLogFile>
-                    <url>${DB_URL}</url>
-                    <username>${DB_USER}</username>
-                    <password>${DB_PASSWORD}</password>
-                    <driver>org.postgresql.Driver</driver>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 

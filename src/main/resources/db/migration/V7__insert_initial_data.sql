@@ -27,12 +27,13 @@ INSERT INTO clientes (
 
 -- Trigger para atualizar updated_at automaticamente
 CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $
+RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at = CURRENT_TIMESTAMP;
     RETURN NEW;
 END;
-$ language 'plpgsql';
+$$ LANGUAGE plpgsql;
+
 
 CREATE TRIGGER update_clientes_updated_at BEFORE UPDATE ON clientes
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -51,4 +52,3 @@ CREATE TRIGGER update_pagamentos_updated_at BEFORE UPDATE ON pagamentos
 
 CREATE TRIGGER update_notificacoes_updated_at BEFORE UPDATE ON notificacoes
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-

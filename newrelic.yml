@@ -1,0 +1,92 @@
+common: &default_settings
+  # License key - será lida da variável de ambiente
+  license_key: '<%= System.getenv("NEW_RELIC_LICENSE_KEY") %>'
+  
+  # Nome da aplicação - será lido da variável de ambiente
+  app_name: '<%= System.getenv("NEW_RELIC_APP_NAME") %>'
+  
+  # Configurações gerais
+  enable_auto_app_naming: false
+  enable_auto_transaction_naming: true
+  
+  # Distributed Tracing
+  distributed_tracing:
+    enabled: true
+
+  # Span Events
+  span_events:
+    enabled: true
+    max_samples_stored: 2000
+
+  # Transaction Events
+  transaction_events:
+    enabled: true
+    max_samples_stored: 2000
+
+  # Custom Events
+  custom_insights_events:
+    enabled: true
+    max_samples_stored: 3000
+
+  # Application Logging
+  application_logging:
+    enabled: true
+    forwarding:
+      enabled: true
+      max_samples_stored: 10000
+    local_decorating:
+      enabled: true
+    metrics:
+      enabled: true
+
+  # Audit Mode (apenas em desenvolvimento)
+  audit_mode: false
+  log_level: info
+  
+  # High Security Mode (produção)
+  high_security: '<%= System.getenv("NEW_RELIC_HIGH_SECURITY") != null ? System.getenv("NEW_RELIC_HIGH_SECURITY") : "false" %>'
+  
+  # Configurações de Performance
+  transaction_tracer:
+    enabled: true
+    transaction_threshold: apdex_f
+    record_sql: obfuscated
+    explain_enabled: true
+    explain_threshold: 500
+    stack_trace_threshold: 500
+
+  # Error Collector
+  error_collector:
+    enabled: true
+    ignore_status_codes: 404
+
+  # Browser Monitoring
+  browser_monitoring:
+    auto_instrument: true
+
+  # JFR (Java Flight Recorder)
+  jfr:
+    enabled: true
+
+  # Labels (úteis para organização)
+  labels:
+    Environment: '<%= System.getenv("NEW_RELIC_ENVIRONMENT") %>'
+    Team: '<%= System.getenv("NEW_RELIC_TEAM") %>'
+    Service: '<%= System.getenv("NEW_RELIC_SERVICE") %>'
+    Version: '<%= System.getenv("NEW_RELIC_VERSION") %>'
+
+# Configurações específicas por ambiente
+production:
+  <<: *default_settings
+  log_level: info
+  audit_mode: false
+
+development:
+  <<: *default_settings
+  log_level: debug
+  audit_mode: true
+
+staging:
+  <<: *default_settings
+  log_level: info
+  audit_mode: false

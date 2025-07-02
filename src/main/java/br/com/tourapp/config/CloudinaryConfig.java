@@ -18,17 +18,16 @@ public class CloudinaryConfig {
     @Value("${app.cloudinary.api-secret}")
     private String apiSecret;
 
-    @Value("${app.cloudinary.secure}")
+    @Value("${app.cloudinary.secure:true}")
     private boolean secure;
 
     @Bean
     public Cloudinary cloudinary() {
         return new Cloudinary(ObjectUtils.asMap(
-            "cloud_name", cloudName,
-            "api_key", apiKey,
-            "api_secret", apiSecret,
-            "secure", secure
+                "cloud_name", cloudName,
+                "api_key", apiKey,
+                "api_secret", apiSecret,
+                "secure", secure
         ));
     }
 }
-

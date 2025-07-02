@@ -1,4 +1,4 @@
-package br.com.tourapp.tourapp;
+package br.com.tourapp;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

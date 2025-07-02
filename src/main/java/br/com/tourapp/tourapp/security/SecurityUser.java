@@ -1,4 +1,4 @@
-package br.com.tourapp.security;
+package br.com.tourapp.tourapp.security;
 
 import br.com.tourapp.entity.Cliente;
 import br.com.tourapp.entity.Organizador;
@@ -40,7 +40,8 @@ public class SecurityUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + tipoUsuario.name()));
+        String role = "ROLE_" + tipoUsuario.name();
+        return Collections.singletonList(new SimpleGrantedAuthority(role));
     }
 
     @Override

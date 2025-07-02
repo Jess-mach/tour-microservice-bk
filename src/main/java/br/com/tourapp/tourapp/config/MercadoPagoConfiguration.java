@@ -1,4 +1,4 @@
-package br.com.tourapp.config;
+package br.com.tourapp.tourapp.config;
 
 import com.mercadopago.MercadoPagoConfig;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,4 +1,4 @@
-package br.com.tourapp.config;
+package br.com.tourapp.tourapp.config;
 
 import jakarta.validation.Validator;
 import org.springframework.context.annotation.Bean;

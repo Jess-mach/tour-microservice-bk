@@ -1,4 +1,4 @@
-package br.com.tourapp.config;
+package br.com.tourapp.tourapp.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

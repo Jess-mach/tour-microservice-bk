@@ -1,11 +1,11 @@
-package br.com.tourapp.controller;
+package br.com.tourapp.tourapp.controller;
 
 import br.com.tourapp.dto.request.InscricaoRequest;
 import br.com.tourapp.dto.response.ExcursaoResponse;
 import br.com.tourapp.dto.response.InscricaoResponse;
 import br.com.tourapp.service.ExcursaoService;
 import br.com.tourapp.service.InscricaoService;
-import br.com.tourapp.security.SecurityUser;
+import br.com.tourapp.tourapp.security.SecurityUser;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

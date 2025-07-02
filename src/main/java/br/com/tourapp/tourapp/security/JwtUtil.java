@@ -1,4 +1,4 @@
-package br.com.tourapp.security;
+package br.com.tourapp.tourapp.security;
 
 import br.com.tourapp.enums.TipoUsuario;
 import io.jsonwebtoken.*;

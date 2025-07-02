@@ -1,7 +1,7 @@
-package br.com.tourapp.config;
+package br.com.tourapp.tourapp.config;
 
-import br.com.tourapp.security.JwtAuthenticationFilter;
-import br.com.tourapp.security.CustomUserDetailsService;
+import br.com.tourapp.tourapp.security.JwtAuthenticationFilter;
+import br.com.tourapp.tourapp.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,7 +24,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(CustomUserDetailsService userDetailsService, 
+    public SecurityConfig(CustomUserDetailsService userDetailsService,
                          JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.userDetailsService = userDetailsService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
@@ -41,16 +41,17 @@ public class SecurityConfig {
                 .requestMatchers("/public/**").permitAll()
                 .requestMatchers("/webhook/**").permitAll()
                 .requestMatchers("/health", "/actuator/health").permitAll()
-                
+                .requestMatchers("/actuator/**").permitAll()
+
                 // Endpoints de organizador
                 .requestMatchers("/organizador/**").hasRole("ORGANIZADOR")
-                
+
                 // Endpoints de cliente
                 .requestMatchers("/cliente/**").hasRole("CLIENTE")
-                
+
                 // Endpoints administrativos (futuro)
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                
+
                 // Todos os outros endpoints requerem autenticação
                 .anyRequest().authenticated()
             )

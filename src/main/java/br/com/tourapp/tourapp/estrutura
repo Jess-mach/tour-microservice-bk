@@ -1,0 +1,126 @@
+tourapp-backend/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── br/
+│   │   │       └── com/
+│   │   │           └── tourapp/
+│   │   │               ├── TourappApplication.java
+│   │   │               ├── config/
+│   │   │               │   ├── SecurityConfig.java
+│   │   │               │   ├── CloudinaryConfig.java
+│   │   │               │   ├── MercadoPagoConfig.java
+│   │   │               │   ├── FirebaseConfig.java
+│   │   │               │   └── CorsConfig.java
+│   │   │               ├── controller/
+│   │   │               │   ├── AuthController.java
+│   │   │               │   ├── OrganizadorController.java
+│   │   │               │   ├── ClienteController.java
+│   │   │               │   ├── ExcursaoController.java
+│   │   │               │   ├── InscricaoController.java
+│   │   │               │   ├── PagamentoController.java
+│   │   │               │   ├── NotificacaoController.java
+│   │   │               │   └── PublicController.java
+│   │   │               ├── dto/
+│   │   │               │   ├── request/
+│   │   │               │   │   ├── LoginRequest.java
+│   │   │               │   │   ├── CadastroOrganizadorRequest.java
+│   │   │               │   │   ├── CadastroClienteRequest.java
+│   │   │               │   │   ├── ExcursaoRequest.java
+│   │   │               │   │   ├── InscricaoRequest.java
+│   │   │               │   │   ├── PagamentoPixRequest.java
+│   │   │               │   │   ├── PagamentoCartaoRequest.java
+│   │   │               │   │   └── NotificacaoRequest.java
+│   │   │               │   └── response/
+│   │   │               │       ├── AuthResponse.java
+│   │   │               │       ├── OrganizadorResponse.java
+│   │   │               │       ├── ClienteResponse.java
+│   │   │               │       ├── ExcursaoResponse.java
+│   │   │               │       ├── ExcursaoPublicaResponse.java
+│   │   │               │       ├── InscricaoResponse.java
+│   │   │               │       ├── DashboardResponse.java
+│   │   │               │       ├── PagamentoResponse.java
+│   │   │               │       └── NotificacaoResponse.java
+│   │   │               ├── entity/
+│   │   │               │   ├── Cliente.java
+│   │   │               │   ├── Organizador.java
+│   │   │               │   ├── Excursao.java
+│   │   │               │   ├── Inscricao.java
+│   │   │               │   ├── Pagamento.java
+│   │   │               │   ├── Notificacao.java
+│   │   │               │   └── BaseEntity.java
+│   │   │               ├── enums/
+│   │   │               │   ├── StatusOrganizador.java
+│   │   │               │   ├── StatusExcursao.java
+│   │   │               │   ├── StatusPagamento.java
+│   │   │               │   ├── MetodoPagamento.java
+│   │   │               │   ├── TipoNotificacao.java
+│   │   │               │   └── TipoUsuario.java
+│   │   │               ├── exception/
+│   │   │               │   ├── GlobalExceptionHandler.java
+│   │   │               │   ├── BusinessException.java
+│   │   │               │   ├── NotFoundException.java
+│   │   │               │   ├── UnauthorizedException.java
+│   │   │               │   └── ValidationException.java
+│   │   │               ├── repository/
+│   │   │               │   ├── ClienteRepository.java
+│   │   │               │   ├── OrganizadorRepository.java
+│   │   │               │   ├── ExcursaoRepository.java
+│   │   │               │   ├── InscricaoRepository.java
+│   │   │               │   ├── PagamentoRepository.java
+│   │   │               │   └── NotificacaoRepository.java
+│   │   │               ├── security/
+│   │   │               │   ├── JwtUtil.java
+│   │   │               │   ├── JwtAuthenticationFilter.java
+│   │   │               │   ├── CustomUserDetailsService.java
+│   │   │               │   └── SecurityUser.java
+│   │   │               ├── service/
+│   │   │               │   ├── AuthService.java
+│   │   │               │   ├── OrganizadorService.java
+│   │   │               │   ├── ClienteService.java
+│   │   │               │   ├── ExcursaoService.java
+│   │   │               │   ├── InscricaoService.java
+│   │   │               │   ├── PagamentoService.java
+│   │   │               │   ├── NotificacaoService.java
+│   │   │               │   ├── EmailService.java
+│   │   │               │   ├── CloudinaryService.java
+│   │   │               │   └── FirebaseService.java
+│   │   │               └── util/
+│   │   │                   ├── ValidationUtil.java
+│   │   │                   ├── DateUtil.java
+│   │   │                   ├── StringUtil.java
+│   │   │                   └── Constants.java
+│   │   └── resources/
+│   │       ├── application.yml
+│   │       ├── application-dev.yml
+│   │       ├── application-prod.yml
+│   │       ├── db/
+│   │       │   └── migration/
+│   │       │       ├── V1__create_cliente_table.sql
+│   │       │       ├── V2__create_organizador_table.sql
+│   │       │       ├── V3__create_excursao_table.sql
+│   │       │       ├── V4__create_inscricao_table.sql
+│   │       │       ├── V5__create_pagamento_table.sql
+│   │       │       ├── V6__create_notificacao_table.sql
+│   │       │       └── V7__insert_initial_data.sql
+│   │       ├── static/
+│   │       └── templates/
+│   │           ├── email/
+│   │           │   ├── confirmacao-inscricao.html
+│   │           │   ├── confirmacao-pagamento.html
+│   │           │   └── lembrete-excursao.html
+│   │           └── firebase-service-account.json
+│   └── test/
+│       └── java/
+│           └── br/
+│               └── com/
+│                   └── tourapp/
+│                       ├── TourappApplicationTests.java
+│                       ├── controller/
+│                       ├── service/
+│                       └── repository/
+├── pom.xml
+├── Dockerfile
+├── docker-compose.yml
+├── README.md
+└── .gitignore

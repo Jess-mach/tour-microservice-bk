@@ -476,3 +476,6 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 ## 📞 Contato
 
 Para dúvidas sobre o projeto, entre em contato através dos issues do GitHub.
+
+
+docker run --name postgres-db -e POSTGRES_PASSWORD=123456 -p 5432:5432 -d postgres:15

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class JwtUtils {
@@ -77,6 +78,22 @@ public class JwtUtils {
                     .parseClaimsJws(token)
                     .getBody()
                     .getSubject();
+        } catch (Exception e) {
+            logger.error("Erro ao extrair username do token interno: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    public UUID extractUserId(String token) {
+        try {
+            String userId = Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getId();
+
+            return UUID.fromString(userId);
         } catch (Exception e) {
             logger.error("Erro ao extrair username do token interno: {}", e.getMessage());
             throw e;

@@ -6,9 +6,13 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "organizadores")
 public class Organizador extends BaseEntity {
@@ -22,6 +26,11 @@ public class Organizador extends BaseEntity {
     @Size(min = 2, max = 100, message = "Nome do responsável deve ter entre 2 e 100 caracteres")
     @Column(name = "nome_responsavel", nullable = false, length = 100)
     private String nomeResponsavel;
+
+    // Campo adicional para nome completo (usado no complete profile)
+    @Size(max = 100, message = "Nome deve ter no máximo 100 caracteres")
+    @Column(length = 100)
+    private String nome;
 
     @Email(message = "Email deve ser válido")
     @NotBlank(message = "Email é obrigatório")
@@ -37,12 +46,38 @@ public class Organizador extends BaseEntity {
     @Column(length = 20)
     private String telefone;
 
+    // Campos de endereço
+    @Size(max = 10, message = "CEP deve ter no máximo 10 caracteres")
+    @Column(length = 10)
+    private String cep;
+
+    @Size(max = 200, message = "Endereço deve ter no máximo 200 caracteres")
+    @Column(length = 200)
+    private String endereco;
+
+    @Size(max = 100, message = "Cidade deve ter no máximo 100 caracteres")
+    @Column(length = 100)
+    private String cidade;
+
+    @Size(max = 2, message = "Estado deve ter no máximo 2 caracteres")
+    @Column(length = 2)
+    private String estado;
+
     @Column(name = "pix_key", length = 100)
     private String pixKey;
 
     @Size(max = 18, message = "CNPJ deve ter no máximo 18 caracteres")
-    @Column(length = 18)
+    @Column(length = 18, unique = true)
     private String cnpj;
+
+    // Campos adicionais para o perfil
+    @Size(max = 1000, message = "Descrição deve ter no máximo 1000 caracteres")
+    @Column(length = 1000)
+    private String descricao;
+
+    @Size(max = 200, message = "Site deve ter no máximo 200 caracteres")
+    @Column(length = 200)
+    private String site;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -68,37 +103,22 @@ public class Organizador extends BaseEntity {
         this.senha = senha;
     }
 
-    // Getters e Setters
-    public String getNomeEmpresa() { return nomeEmpresa; }
-    public void setNomeEmpresa(String nomeEmpresa) { this.nomeEmpresa = nomeEmpresa; }
+    // Método para verificar se perfil está completo
+    public boolean isPerfilCompleto() {
+        return nome != null && !nome.trim().isEmpty() &&
+                telefone != null && !telefone.trim().isEmpty() &&
+                nomeEmpresa != null && !nomeEmpresa.trim().isEmpty() &&
+                cnpj != null && !cnpj.trim().isEmpty() &&
+                endereco != null && !endereco.trim().isEmpty() &&
+                cidade != null && !cidade.trim().isEmpty() &&
+                estado != null && !estado.trim().isEmpty();
+    }
 
-    public String getNomeResponsavel() { return nomeResponsavel; }
-    public void setNomeResponsavel(String nomeResponsavel) { this.nomeResponsavel = nomeResponsavel; }
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getSenha() { return senha; }
-    public void setSenha(String senha) { this.senha = senha; }
-
-    public String getTelefone() { return telefone; }
-    public void setTelefone(String telefone) { this.telefone = telefone; }
-
-    public String getPixKey() { return pixKey; }
-    public void setPixKey(String pixKey) { this.pixKey = pixKey; }
-
-    public String getCnpj() { return cnpj; }
-    public void setCnpj(String cnpj) { this.cnpj = cnpj; }
-
-    public StatusOrganizador getStatus() { return status; }
-    public void setStatus(StatusOrganizador status) { this.status = status; }
-
-    public TipoUsuario getTipoUsuario() { return tipoUsuario; }
-    public void setTipoUsuario(TipoUsuario tipoUsuario) { this.tipoUsuario = tipoUsuario; }
-
-    public List<Excursao> getExcursoes() { return excursoes; }
-    public void setExcursoes(List<Excursao> excursoes) { this.excursoes = excursoes; }
-
-    public List<Notificacao> getNotificacoes() { return notificacoes; }
-    public void setNotificacoes(List<Notificacao> notificacoes) { this.notificacoes = notificacoes; }
+    // Getter para nome que fallback para nomeResponsavel se nome estiver vazio
+    public String getNome() {
+        if (nome != null && !nome.trim().isEmpty()) {
+            return nome;
+        }
+        return nomeResponsavel;
+    }
 }

@@ -1,6 +1,8 @@
 package br.com.tourapp.controller;
 
+import br.com.tourapp.dto.request.CompleteProfileRequest;
 import br.com.tourapp.dto.request.TokenRefreshRequest;
+import br.com.tourapp.dto.response.CompleteProfileResponse;
 import br.com.tourapp.dto.response.JwtResponse;
 import br.com.tourapp.dto.response.TokenRefreshResponse;
 import br.com.tourapp.dto.response.UserInfoResponse;
@@ -10,11 +12,13 @@ import br.com.tourapp.service.RefreshTokenUseCase;
 import br.com.tourapp.service.UserUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -109,5 +113,17 @@ public class AuthController {
     ) {
         userService.updateSubscription(email, plan, months);
         return ResponseEntity.ok(Map.of("message", "Assinatura atualizada com sucesso"));
+    }
+
+    @PostMapping("/complete-profile")
+    public ResponseEntity<CompleteProfileResponse> completeProfile(
+            @Valid @RequestBody CompleteProfileRequest request,
+            @AuthenticationPrincipal SecurityUser userDetails) {
+
+        CompleteProfileResponse response = authenticationService.completeProfile(
+                request, userDetails.getUsername(), userDetails.getId()
+        );
+
+        return ResponseEntity.ok(response);
     }
 }

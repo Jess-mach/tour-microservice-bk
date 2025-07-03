@@ -5,9 +5,13 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "clientes")
 public class Cliente extends BaseEntity {
@@ -30,6 +34,23 @@ public class Cliente extends BaseEntity {
     @Size(max = 20, message = "Telefone deve ter no máximo 20 caracteres")
     @Column(length = 20)
     private String telefone;
+
+    // Campos de endereço
+    @Size(max = 10, message = "CEP deve ter no máximo 10 caracteres")
+    @Column(length = 10)
+    private String cep;
+
+    @Size(max = 200, message = "Endereço deve ter no máximo 200 caracteres")
+    @Column(length = 200)
+    private String endereco;
+
+    @Size(max = 100, message = "Cidade deve ter no máximo 100 caracteres")
+    @Column(length = 100)
+    private String cidade;
+
+    @Size(max = 2, message = "Estado deve ter no máximo 2 caracteres")
+    @Column(length = 2)
+    private String estado;
 
     @Column(name = "push_token")
     private String pushToken;
@@ -59,34 +80,12 @@ public class Cliente extends BaseEntity {
         this.senha = senha;
     }
 
-    // Getters e Setters
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getSenha() { return senha; }
-    public void setSenha(String senha) { this.senha = senha; }
-
-    public String getTelefone() { return telefone; }
-    public void setTelefone(String telefone) { this.telefone = telefone; }
-
-    public String getPushToken() { return pushToken; }
-    public void setPushToken(String pushToken) { this.pushToken = pushToken; }
-
-    public Boolean getEmailNotifications() { return emailNotifications; }
-    public void setEmailNotifications(Boolean emailNotifications) { this.emailNotifications = emailNotifications; }
-
-    public Boolean getSmsNotifications() { return smsNotifications; }
-    public void setSmsNotifications(Boolean smsNotifications) { this.smsNotifications = smsNotifications; }
-
-    public Boolean getAtivo() { return ativo; }
-    public void setAtivo(Boolean ativo) { this.ativo = ativo; }
-
-    public TipoUsuario getTipoUsuario() { return tipoUsuario; }
-    public void setTipoUsuario(TipoUsuario tipoUsuario) { this.tipoUsuario = tipoUsuario; }
-
-    public List<Inscricao> getInscricoes() { return inscricoes; }
-    public void setInscricoes(List<Inscricao> inscricoes) { this.inscricoes = inscricoes; }
+    // Método para verificar se perfil está completo
+    public boolean isPerfilCompleto() {
+        return nome != null && !nome.trim().isEmpty() &&
+                telefone != null && !telefone.trim().isEmpty() &&
+                endereco != null && !endereco.trim().isEmpty() &&
+                cidade != null && !cidade.trim().isEmpty() &&
+                estado != null && !estado.trim().isEmpty();
+    }
 }

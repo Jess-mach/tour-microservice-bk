@@ -92,6 +92,7 @@
             <groupId>net.lbruun.springboot</groupId>
             <artifactId>preliquibase-spring-boot-starter</artifactId>
             <version>1.6.1</version>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- JWT - Versões compatíveis com JDK 21 -->
@@ -283,6 +284,21 @@
                         <exclude>**/*IT.java</exclude>
                         <exclude>**/*IntegrationTest.java</exclude>
                     </excludes>
+
+                    <!-- Para projetos com Testcontainers ou Docker -->
+                    <argLine>
+                        -Dfile.encoding=UTF-8
+                        -Duser.timezone=America/Sao_Paulo
+                        -Xmx2048m
+                        -XX:+HeapDumpOnOutOfMemoryError
+                        --add-opens java.base/java.lang=ALL-UNNAMED
+                        --add-opens java.base/java.util=ALL-UNNAMED
+                    </argLine>
+
+                    <systemPropertyVariables>
+                        <spring.profiles.active>test</spring.profiles.active>
+                        <testcontainers.reuse.enable>true</testcontainers.reuse.enable>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 

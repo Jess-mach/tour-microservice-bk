@@ -1,0 +1,2 @@
+-- schema.sql
+CREATE SCHEMA IF NOT EXISTS TOURDB;

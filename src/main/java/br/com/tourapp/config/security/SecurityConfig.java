@@ -45,13 +45,23 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/api/**").authenticated() TODO
-                        // Permitir acesso público para os endpoints de autenticação e OPTIONS
-                        .requestMatchers("/api/auth/**",
+                        // ORDEM IMPORTANTE: regras mais específicas primeiro!
+
+                        // Endpoints públicos devem vir ANTES das regras gerais
+                        .requestMatchers(
                                 "/oauth2/**", "/login/**",
-                                "/api/auth/google/**", "/health"
+                                "/api/v1/auth/google/**", "/health"
                         ).permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                        // Endpoints de admin
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
+                        // Endpoint específico que precisa de autenticação
+                        .requestMatchers("/api/v1/auth/complete-profile").authenticated()
+
+                        // Regra geral para /api/** - deve vir DEPOIS das exceções
+                        .requestMatchers("/api/**").authenticated()
+
                         // É crucial permitir requests OPTIONS para CORS preflight
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 

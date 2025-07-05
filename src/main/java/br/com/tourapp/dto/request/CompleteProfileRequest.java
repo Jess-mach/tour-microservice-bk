@@ -1,10 +1,12 @@
 package br.com.tourapp.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true) // Ignora campos não mapeados como 'email'
 public class CompleteProfileRequest {
 
     @NotBlank(message = "Nome é obrigatório")
@@ -25,9 +27,6 @@ public class CompleteProfileRequest {
 
     @Size(max = 2, message = "Estado deve ter no máximo 2 caracteres")
     private String estado;
-
-    // Campo para integração com Google
-    private String googleId;
 
     // Campos específicos para organizador
     @Size(max = 18, message = "CNPJ deve ter no máximo 18 caracteres")

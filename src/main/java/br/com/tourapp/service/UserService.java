@@ -101,13 +101,15 @@ public class UserService implements UserUseCase {
         return new JwtResponse(
                 accessToken,
                 refreshToken,
+                "Bearer",
                 user.getId() != null ? user.getId() : 0,
                 user.getEmail(),
                 user.getFullName(),
                 roles,
                 user.getProfilePicture(),
                 user.getSubscriptionPlan(),
-                hasActiveSubscription
+                hasActiveSubscription,
+                true
         );
     }
 

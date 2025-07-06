@@ -1,5 +1,8 @@
-package br.com.tourapp.entity;
+package br.com.tourapp.dto;
 
+import br.com.tourapp.entity.Cliente;
+import br.com.tourapp.entity.Organizador;
+import br.com.tourapp.entity.UserEntity;
 import br.com.tourapp.enums.TipoUsuario;
 import lombok.Getter;
 import lombok.Setter;

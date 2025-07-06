@@ -6,7 +6,7 @@ import br.com.tourapp.dto.response.CompleteProfileResponse;
 import br.com.tourapp.dto.response.JwtResponse;
 import br.com.tourapp.dto.response.TokenRefreshResponse;
 import br.com.tourapp.dto.response.UserInfoResponse;
-import br.com.tourapp.entity.SecurityUser;
+import br.com.tourapp.dto.SecurityUser;
 import br.com.tourapp.service.AuthenticationUseCase;
 import br.com.tourapp.service.RefreshTokenUseCase;
 import br.com.tourapp.service.UserUseCase;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/auth")
 @Tag(name = "Autenticação", description = "Endpoints para autenticação e gestão de usuários")
 public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);

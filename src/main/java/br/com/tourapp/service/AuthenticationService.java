@@ -1,5 +1,6 @@
 package br.com.tourapp.service;
 
+import br.com.tourapp.dto.SecurityUser;
 import br.com.tourapp.dto.request.CompleteProfileRequest;
 import br.com.tourapp.dto.response.CompleteProfileResponse;
 import br.com.tourapp.dto.response.JwtResponse;

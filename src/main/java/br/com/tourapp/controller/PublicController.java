@@ -5,7 +5,7 @@ import br.com.tourapp.dto.response.ExcursaoResponse;
 import br.com.tourapp.dto.response.InscricaoResponse;
 import br.com.tourapp.service.ExcursaoService;
 import br.com.tourapp.service.InscricaoService;
-import br.com.tourapp.entity.SecurityUser;
+import br.com.tourapp.dto.SecurityUser;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

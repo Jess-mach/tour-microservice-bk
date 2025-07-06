@@ -106,6 +106,8 @@ public class JwtUtils {
      */
     public boolean validateJwtToken(String token) {
         try {
+            token = token.startsWith("Bearer ") ? token.substring(7) : token; // Remove "Bearer " se presente
+
             Jwts.parserBuilder()
                     .setSigningKey(secretKey)
                     .build()

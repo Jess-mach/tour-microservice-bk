@@ -4,7 +4,7 @@ import br.com.tourapp.dto.request.NotificacaoRequest;
 import br.com.tourapp.dto.response.NotificacaoResponse;
 import br.com.tourapp.entity.Cliente;
 import br.com.tourapp.service.NotificationUseCase;
-import br.com.tourapp.entity.SecurityUser;
+import br.com.tourapp.dto.SecurityUser;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

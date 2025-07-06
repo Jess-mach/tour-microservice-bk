@@ -1,6 +1,6 @@
 package br.com.tourapp.config.security;
 
-import br.com.tourapp.entity.SecurityUser;
+import br.com.tourapp.dto.SecurityUser;
 import br.com.tourapp.service.UserDetailsProvider;
 import br.com.tourapp.util.JwtUtils;
 import jakarta.servlet.FilterChain;

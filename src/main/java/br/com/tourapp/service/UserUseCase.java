@@ -3,7 +3,7 @@ package br.com.tourapp.service;
 import br.com.tourapp.dto.response.JwtResponse;
 import br.com.tourapp.dto.response.UserInfoResponse;
 import br.com.tourapp.entity.UserEntity;
-import br.com.tourapp.entity.SecurityUser;
+import br.com.tourapp.dto.SecurityUser;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Map;

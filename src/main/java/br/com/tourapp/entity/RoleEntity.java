@@ -12,6 +12,8 @@ public class RoleEntity {
     public static final String ROLE_USER = "ROLE_USER";
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
     public static final String ROLE_PREMIUM = "ROLE_PREMIUM";
+    public static final String ROLE_ORGANIZADOR = "ROLE_ORGANIZADOR";
+    public static final String ROLE_CLIENTE = "ROLE_CLIENTE";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

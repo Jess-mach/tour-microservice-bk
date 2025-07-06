@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -46,19 +45,14 @@ public class AuthController {
     @PostMapping("/google")
     @Operation(summary = "Autenticar com Google", description = "Autentica usuário usando Google ID Token")
     public ResponseEntity<JwtResponse> authenticateWithGoogle(@RequestBody Map<String, String> request) {
-        try {
-            String idToken = request.get("idToken");
-            if (idToken == null || idToken.trim().isEmpty()) {
-                throw new RuntimeException("ID Token é obrigatório");
-            }
-
-            logger.info("Recebendo solicitação de autenticação Google");
-            JwtResponse jwtResponse = authenticationService.authenticateWithGoogle(idToken);
-            return ResponseEntity.ok(jwtResponse);
-        } catch (Exception e) {
-            logger.error("Erro na autenticação Google: {}", e.getMessage(), e);
-            throw new RuntimeException("Falha na autenticação: " + e.getMessage());
+        String idToken = request.get("idToken");
+        if (idToken == null || idToken.trim().isEmpty()) {
+            throw new RuntimeException("ID Token é obrigatório");
         }
+
+        logger.info("Recebendo solicitação de autenticação Google");
+        JwtResponse jwtResponse = authenticationService.authenticateWithGoogle(idToken);
+        return ResponseEntity.ok(jwtResponse);
     }
 
     @GetMapping("/validate")

@@ -72,14 +72,35 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         user.setActive(true);
 
         // Atribuindo papel USER por padrão
-        RoleEntity userRole = roleRepository.findByName(RoleEntity.ROLE_USER)
+        RoleEntity role = roleRepository.findByName(RoleEntity.ROLE_USER)
                 .orElseGet(() -> {
                     RoleEntity newRole = new RoleEntity();
                     newRole.setName(RoleEntity.ROLE_USER);
                     return roleRepository.save(newRole);
                 });
 
-        user.getRoles().add(userRole);
+        user.getRoles().add(role);
+
+        // Atribuindo papel USER por padrão
+        role = roleRepository.findByName(RoleEntity.ROLE_ORGANIZADOR)
+                .orElseGet(() -> {
+                    RoleEntity newRole = new RoleEntity();
+                    newRole.setName(RoleEntity.ROLE_ORGANIZADOR);
+                    return roleRepository.save(newRole);
+                });
+
+        user.getRoles().add(role);
+
+        // Atribuindo papel USER por padrão
+        role = roleRepository.findByName(RoleEntity.ROLE_CLIENTE)
+                .orElseGet(() -> {
+                    RoleEntity newRole = new RoleEntity();
+                    newRole.setName(RoleEntity.ROLE_CLIENTE);
+                    return roleRepository.save(newRole);
+                });
+
+        user.getRoles().add(role);
+
         userRepository.save(user);
         logger.info("Novo usuário criado: {}", email);
     }

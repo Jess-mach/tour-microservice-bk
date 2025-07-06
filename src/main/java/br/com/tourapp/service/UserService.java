@@ -102,7 +102,7 @@ public class UserService implements UserUseCase {
                 accessToken,
                 refreshToken,
                 "Bearer",
-                user.getId() != null ? user.getId() : 0,
+                user.getId() != null ? user.getId().toString() : "",
                 user.getEmail(),
                 user.getFullName(),
                 roles,
@@ -131,14 +131,35 @@ public class UserService implements UserUseCase {
                     newUser.setActive(true);
 
                     // Atribui papel USER por padrão
-                    RoleEntity userRole = roleRepository.findByName(RoleEntity.ROLE_USER)
+                    RoleEntity role = roleRepository.findByName(RoleEntity.ROLE_USER)
                             .orElseGet(() -> {
                                 RoleEntity newRole = new RoleEntity();
                                 newRole.setName(RoleEntity.ROLE_USER);
                                 return roleRepository.save(newRole);
                             });
 
-                    newUser.getRoles().add(userRole);
+                    newUser.getRoles().add(role);
+
+                    // Atribuindo papel USER por padrão
+                    role = roleRepository.findByName(RoleEntity.ROLE_ORGANIZADOR)
+                            .orElseGet(() -> {
+                                RoleEntity newRole = new RoleEntity();
+                                newRole.setName(RoleEntity.ROLE_ORGANIZADOR);
+                                return roleRepository.save(newRole);
+                            });
+
+                    newUser.getRoles().add(role);
+
+                    // Atribuindo papel USER por padrão
+                    role = roleRepository.findByName(RoleEntity.ROLE_CLIENTE)
+                            .orElseGet(() -> {
+                                RoleEntity newRole = new RoleEntity();
+                                newRole.setName(RoleEntity.ROLE_CLIENTE);
+                                return roleRepository.save(newRole);
+                            });
+
+                    newUser.getRoles().add(role);
+
                     return userRepository.save(newUser);
                 });
 
@@ -205,7 +226,7 @@ public class UserService implements UserUseCase {
                 user.getSubscriptionExpiry().isAfter(LocalDateTime.now());
 
         return new UserInfoResponse(
-                user.getId() != null ? user.getId() : 0,
+                user.getId(),
                 user.getEmail(),
                 user.getFullName(),
                 user.getProfilePicture(),

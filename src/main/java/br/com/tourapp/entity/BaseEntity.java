@@ -22,7 +22,7 @@ public abstract class BaseEntity {
     private UUID id;
 
     @Column(name = "google_id", unique = true)
-    private UUID googleId;
+    private String googleId;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -34,39 +34,6 @@ public abstract class BaseEntity {
 
     @Version
     private Long version;
-
-    // Getters e Setters
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public Long getVersion() {
-        return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
-    }
 
     @Override
     public boolean equals(Object o) {

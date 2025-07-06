@@ -1,16 +1,22 @@
 package br.com.tourapp.entity;
 
 import br.com.tourapp.enums.TipoUsuario;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
+@Getter
+@Setter
 public class SecurityUser implements UserDetails {
-
+    private final UserDetails userDetails;
     private final UUID id;
     private final String email;
     private final String senha;
@@ -18,7 +24,8 @@ public class SecurityUser implements UserDetails {
     private final TipoUsuario tipoUsuario;
     private final boolean ativo;
 
-    public SecurityUser(Cliente cliente) {
+    public SecurityUser(UserDetails userDetails, Cliente cliente) {
+        this.userDetails = userDetails;
         this.id = cliente.getId();
         this.email = cliente.getEmail();
         this.senha = cliente.getSenha();
@@ -27,13 +34,36 @@ public class SecurityUser implements UserDetails {
         this.ativo = cliente.getAtivo();
     }
 
-    public SecurityUser(Organizador organizador) {
+    public SecurityUser(UserDetails userDetails, Organizador organizador) {
+        this.userDetails = userDetails;
         this.id = organizador.getId();
         this.email = organizador.getEmail();
         this.senha = organizador.getSenha();
         this.nome = organizador.getNomeEmpresa();
         this.tipoUsuario = organizador.getTipoUsuario();
         this.ativo = organizador.getStatus().name().equals("ATIVO");
+    }
+
+    public SecurityUser(UserEntity user, List<SimpleGrantedAuthority> authorities) {
+        this.id = user.getId();
+        this.email = user.getEmail();
+
+        this.senha = "";
+        this.nome = user.getFullName();
+        this.tipoUsuario = TipoUsuario.CLIENTE;
+        this.ativo = user.isActive();
+
+        // Não precisamos de senha com autenticação OAuth2
+
+        this.userDetails = User.builder()
+                .username(user.getEmail())
+                .password("") // Não precisamos de senha com autenticação OAuth2
+                .authorities(authorities)
+                .accountExpired(!user.isActive())
+                .accountLocked(!user.isActive())
+                .credentialsExpired(false)
+                .disabled(!user.isActive())
+                .build();
     }
 
     @Override

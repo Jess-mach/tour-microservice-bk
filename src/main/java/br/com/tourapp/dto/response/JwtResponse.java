@@ -7,7 +7,7 @@ public record JwtResponse(
     String token,
     String refreshToken,
     String type,
-    Long id,
+    String id,
     String email,
     String name,
     List<String> roles,

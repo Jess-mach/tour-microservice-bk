@@ -94,7 +94,7 @@ public class AuthenticationService implements AuthenticationUseCase{
     }
 
     private CompleteProfileResponse completeClienteProfile(Cliente cliente, CompleteProfileRequest request, UUID userId) {
-        cliente.setGoogleId(userId);
+        //cliente.setGoogleId(userId);
 
         // Atualizar dados do cliente
         if (request.getNome() != null) {
@@ -135,7 +135,7 @@ public class AuthenticationService implements AuthenticationUseCase{
     }
 
     private CompleteProfileResponse completeOrganizadorProfile(Organizador organizador, CompleteProfileRequest request, UUID userId) {
-        organizador.setGoogleId(userId);
+        //organizador.setGoogleId(userId);
         // Atualizar dados básicos
         if (request.getNome() != null) {
             organizador.setNome(request.getNome());

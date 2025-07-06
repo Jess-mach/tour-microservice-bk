@@ -31,16 +31,6 @@ public class UserDetailsServiceImpl implements UserDetailsProvider {
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toList());
 
-        UserDetails build = User.builder()
-                .username(user.getEmail())
-                .password("") // Não precisamos de senha com autenticação OAuth2
-                .authorities(authorities)
-                .accountExpired(!user.isActive())
-                .accountLocked(!user.isActive())
-                .credentialsExpired(false)
-                .disabled(!user.isActive())
-                .build();
-
-        return (SecurityUser) build;
+        return new SecurityUser(user, authorities);
     }
 }

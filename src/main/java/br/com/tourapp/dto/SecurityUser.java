@@ -50,14 +50,12 @@ public class SecurityUser implements UserDetails {
     public SecurityUser(UserEntity user, List<SimpleGrantedAuthority> authorities) {
         this.id = user.getId();
         this.email = user.getEmail();
-
         this.senha = "";
         this.nome = user.getFullName();
         this.tipoUsuario = TipoUsuario.CLIENTE;
         this.ativo = user.isActive();
 
-        // Não precisamos de senha com autenticação OAuth2
-
+        // Criar UserDetails com as authorities corretas do banco
         this.userDetails = User.builder()
                 .username(user.getEmail())
                 .password("") // Não precisamos de senha com autenticação OAuth2
@@ -71,6 +69,12 @@ public class SecurityUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        // CORREÇÃO: Usar authorities do userDetails quando disponível (que vem do banco)
+        if (userDetails != null && userDetails.getAuthorities() != null && !userDetails.getAuthorities().isEmpty()) {
+            return userDetails.getAuthorities();
+        }
+
+        // Fallback: usar tipoUsuario apenas quando userDetails não está disponível
         String role = "ROLE_" + tipoUsuario.name();
         return Collections.singletonList(new SimpleGrantedAuthority(role));
     }
@@ -122,4 +126,3 @@ public class SecurityUser implements UserDetails {
         return tipoUsuario;
     }
 }
-

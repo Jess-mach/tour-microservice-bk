@@ -1,7 +1,5 @@
 package br.com.tourapp.dto;
 
-import br.com.tourapp.entity.Cliente;
-import br.com.tourapp.entity.Organizador;
 import br.com.tourapp.entity.UserEntity;
 import br.com.tourapp.enums.TipoUsuario;
 import lombok.Getter;
@@ -27,43 +25,23 @@ public class SecurityUser implements UserDetails {
     private final TipoUsuario tipoUsuario;
     private final boolean ativo;
 
-    public SecurityUser(UserDetails userDetails, Cliente cliente) {
-        this.userDetails = userDetails;
-        this.id = cliente.getId();
-        this.email = cliente.getEmail();
-        this.senha = cliente.getSenha();
-        this.nome = cliente.getNome();
-        this.tipoUsuario = cliente.getTipoUsuario();
-        this.ativo = cliente.getAtivo();
-    }
-
-    public SecurityUser(UserDetails userDetails, Organizador organizador) {
-        this.userDetails = userDetails;
-        this.id = organizador.getId();
-        this.email = organizador.getEmail();
-        this.senha = organizador.getSenha();
-        this.nome = organizador.getNomeEmpresa();
-        this.tipoUsuario = organizador.getTipoUsuario();
-        this.ativo = organizador.getStatus().name().equals("ATIVO");
-    }
-
     public SecurityUser(UserEntity user, List<SimpleGrantedAuthority> authorities) {
         this.id = user.getId();
         this.email = user.getEmail();
         this.senha = "";
         this.nome = user.getFullName();
         this.tipoUsuario = TipoUsuario.CLIENTE;
-        this.ativo = user.isActive();
+        this.ativo = user.isAtivo();
 
         // Criar UserDetails com as authorities corretas do banco
         this.userDetails = User.builder()
                 .username(user.getEmail())
                 .password("") // Não precisamos de senha com autenticação OAuth2
                 .authorities(authorities)
-                .accountExpired(!user.isActive())
-                .accountLocked(!user.isActive())
+                .accountExpired(!user.isAtivo())
+                .accountLocked(!user.isAtivo())
                 .credentialsExpired(false)
-                .disabled(!user.isActive())
+                .disabled(!user.isAtivo())
                 .build();
     }
 

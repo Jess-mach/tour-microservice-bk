@@ -17,8 +17,8 @@ public class Inscricao extends BaseEntity {
     private Excursao excursao;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cliente_id", nullable = false)
-    private Cliente cliente;
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
     @NotNull(message = "Valor pago é obrigatório")
     @DecimalMin(value = "0.01", message = "Valor deve ser maior que zero")
@@ -38,18 +38,27 @@ public class Inscricao extends BaseEntity {
     // Construtores
     public Inscricao() {}
 
-    public Inscricao(Excursao excursao, Cliente cliente, BigDecimal valorPago) {
+    public Inscricao(Excursao excursao, UserEntity user, BigDecimal valorPago) {
         this.excursao = excursao;
-        this.cliente = cliente;
+        this.user = user;
         this.valorPago = valorPago;
+    }
+
+    // Métodos auxiliares para compatibilidade
+    public UserEntity getCliente() {
+        return user;
+    }
+
+    public void setCliente(UserEntity user) {
+        this.user = user;
     }
 
     // Getters e Setters
     public Excursao getExcursao() { return excursao; }
     public void setExcursao(Excursao excursao) { this.excursao = excursao; }
 
-    public Cliente getCliente() { return cliente; }
-    public void setCliente(Cliente cliente) { this.cliente = cliente; }
+    public UserEntity getUser() { return user; }
+    public void setUser(UserEntity user) { this.user = user; }
 
     public BigDecimal getValorPago() { return valorPago; }
     public void setValorPago(BigDecimal valorPago) { this.valorPago = valorPago; }

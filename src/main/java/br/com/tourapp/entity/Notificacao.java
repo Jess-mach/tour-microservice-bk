@@ -14,8 +14,12 @@ import java.util.UUID;
 public class Notificacao extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "organizador_id", nullable = false)
-    private Organizador organizador;
+    @JoinColumn(name = "compania_id", nullable = false)
+    private CompaniaEntity compania;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "criador_id", nullable = false)
+    private UserEntity criador;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "excursao_id")
@@ -52,8 +56,9 @@ public class Notificacao extends BaseEntity {
     // Construtores
     public Notificacao() {}
 
-    public Notificacao(Organizador organizador, String titulo, String mensagem, TipoNotificacao tipo) {
-        this.organizador = organizador;
+    public Notificacao(CompaniaEntity compania, UserEntity criador, String titulo, String mensagem, TipoNotificacao tipo) {
+        this.compania = compania;
+        this.criador = criador;
         this.titulo = titulo;
         this.mensagem = mensagem;
         this.tipo = tipo;
@@ -68,9 +73,21 @@ public class Notificacao extends BaseEntity {
         return !isEnviada() && (enviarParaTodos || (clientesAlvo != null && !clientesAlvo.isEmpty()));
     }
 
+    // Métodos de compatibilidade
+    public UserEntity getOrganizador() {
+        return criador;
+    }
+
+    public void setOrganizador(UserEntity criador) {
+        this.criador = criador;
+    }
+
     // Getters e Setters
-    public Organizador getOrganizador() { return organizador; }
-    public void setOrganizador(Organizador organizador) { this.organizador = organizador; }
+    public CompaniaEntity getCompania() { return compania; }
+    public void setCompania(CompaniaEntity compania) { this.compania = compania; }
+
+    public UserEntity getCriador() { return criador; }
+    public void setCriador(UserEntity criador) { this.criador = criador; }
 
     public Excursao getExcursao() { return excursao; }
     public void setExcursao(Excursao excursao) { this.excursao = excursao; }

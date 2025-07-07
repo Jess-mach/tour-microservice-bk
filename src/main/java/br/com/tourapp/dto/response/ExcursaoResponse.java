@@ -1,12 +1,14 @@
 package br.com.tourapp.dto.response;
 
 import br.com.tourapp.enums.StatusExcursao;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Setter
 public class ExcursaoResponse {
 
     private UUID id;

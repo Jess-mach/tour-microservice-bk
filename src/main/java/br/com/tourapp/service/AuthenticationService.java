@@ -1,6 +1,7 @@
 package br.com.tourapp.service;
 
 import br.com.tourapp.dto.SecurityUser;
+import br.com.tourapp.dto.enums.RoleCompania;
 import br.com.tourapp.dto.request.CompleteProfileRequest;
 import br.com.tourapp.dto.response.CompleteProfileResponse;
 import br.com.tourapp.dto.response.JwtResponse;
@@ -8,8 +9,9 @@ import br.com.tourapp.dto.response.TokenRefreshResponse;
 import br.com.tourapp.entity.*;
 import br.com.tourapp.enums.TipoUsuario;
 import br.com.tourapp.exception.BusinessException;
-import br.com.tourapp.repository.ClienteRepository;
-import br.com.tourapp.repository.OrganizadorRepository;
+import br.com.tourapp.repository.UserRepository;
+import br.com.tourapp.repository.CompaniaRepository;
+import br.com.tourapp.repository.UserCompaniaRepository;
 import br.com.tourapp.util.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,14 +23,12 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class AuthenticationService implements AuthenticationUseCase{
+public class AuthenticationService implements AuthenticationUseCase {
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
-
-    private final ClienteRepository clienteRepository;
-
-    private final OrganizadorRepository organizadorRepository;
-
+    private final UserRepository userRepository;
+    private final CompaniaRepository companiaRepository;
+    private final UserCompaniaRepository userCompaniaRepository;
     private final JwtUtils jwtUtils;
 
     /**
@@ -78,139 +78,147 @@ public class AuthenticationService implements AuthenticationUseCase{
 
     @Transactional
     public CompleteProfileResponse completeProfile(CompleteProfileRequest request, String email, UUID userId) {
+        // Buscar usuário unificado
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BusinessException("Usuário não encontrado"));
 
-        // Verificar se é cliente
-        Cliente cliente = clienteRepository.findByEmail(email).orElse(null);
-        if (cliente != null) {
-            return completeClienteProfile(cliente, request, userId);
-        }
-
-        // Verificar se é organizador
-        Organizador organizador = organizadorRepository.findByEmail(email).orElse(null);
-        if (organizador != null) {
-            return completeOrganizadorProfile(organizador, request, userId);
-        }
-
-        throw new BusinessException("Usuário não encontrado");
-    }
-
-    private CompleteProfileResponse completeClienteProfile(Cliente cliente, CompleteProfileRequest request, UUID userId) {
-        //cliente.setGoogleId(userId);
-
-        // Atualizar dados do cliente
+        // Atualizar dados básicos do usuário
         if (request.getNome() != null) {
-            cliente.setNome(request.getNome());
+            user.setFullName(request.getNome());
         }
         if (request.getTelefone() != null) {
-            cliente.setTelefone(request.getTelefone());
+            user.setPhone(request.getTelefone());
         }
         if (request.getCep() != null) {
-            cliente.setCep(request.getCep());
+            user.setCep(request.getCep());
         }
         if (request.getEndereco() != null) {
-            cliente.setEndereco(request.getEndereco());
+            user.setEndereco(request.getEndereco());
         }
         if (request.getCidade() != null) {
-            cliente.setCidade(request.getCidade());
+            user.setCidade(request.getCidade());
         }
         if (request.getEstado() != null) {
-            cliente.setEstado(request.getEstado());
+            user.setEstado(request.getEstado());
         }
 
-        cliente.setUpdatedAt(LocalDateTime.now());
-        cliente = clienteRepository.save(cliente);
+        // Se tem dados de empresa, é organizador
+        if (temDadosEmpresa(request)) {
+            return completeOrganizadorProfile(user, request);
+        } else {
+            return completeClienteProfile(user, request);
+        }
+    }
+
+    private CompleteProfileResponse completeClienteProfile(UserEntity user, CompleteProfileRequest request) {
+        // Apenas salvar o usuário (dados básicos já foram atualizados)
+        user = userRepository.save(user);
 
         CompleteProfileResponse response = new CompleteProfileResponse();
-        response.setId(cliente.getId());
-        response.setEmail(cliente.getEmail());
-        response.setNome(cliente.getNome());
-        response.setTelefone(cliente.getTelefone());
-        response.setCep(cliente.getCep());
-        response.setEndereco(cliente.getEndereco());
-        response.setCidade(cliente.getCidade());
-        response.setEstado(cliente.getEstado());
+        response.setId(user.getId());
+        response.setEmail(user.getEmail());
+        response.setNome(user.getFullName());
+        response.setTelefone(user.getPhone());
+        response.setCep(user.getCep());
+        response.setEndereco(user.getEndereco());
+        response.setCidade(user.getCidade());
+        response.setEstado(user.getEstado());
         response.setTipoUsuario(TipoUsuario.CLIENTE);
-        response.setPerfilCompleto(isPerfilCompleto(cliente));
+        response.setPerfilCompleto(isPerfilCompletoCliente(user));
 
         return response;
     }
 
-    private CompleteProfileResponse completeOrganizadorProfile(Organizador organizador, CompleteProfileRequest request, UUID userId) {
-        //organizador.setGoogleId(userId);
-        // Atualizar dados básicos
-        if (request.getNome() != null) {
-            organizador.setNome(request.getNome());
-        }
-        if (request.getTelefone() != null) {
-            organizador.setTelefone(request.getTelefone());
-        }
-        if (request.getCep() != null) {
-            organizador.setCep(request.getCep());
-        }
-        if (request.getEndereco() != null) {
-            organizador.setEndereco(request.getEndereco());
-        }
-        if (request.getCidade() != null) {
-            organizador.setCidade(request.getCidade());
-        }
-        if (request.getEstado() != null) {
-            organizador.setEstado(request.getEstado());
-        }
+    private CompleteProfileResponse completeOrganizadorProfile(UserEntity user, CompleteProfileRequest request) {
+        // Verificar se já tem compania
+        var companias = companiaRepository.findByUserId(user.getId());
+        CompaniaEntity compania;
 
-        // Atualizar dados específicos do organizador
-        if (request.getCnpj() != null && !request.getCnpj().equals(organizador.getCnpj())) {
-            if (organizadorRepository.existsByCnpj(request.getCnpj())) {
+        if (companias.isEmpty()) {
+            // Criar nova compania
+            compania = new CompaniaEntity();
+            compania.setNomeEmpresa(request.getNomeEmpresa());
+            compania.setCnpj(request.getCnpj());
+            compania.setDescricao(request.getDescricao());
+            compania.setSite(request.getSite());
+
+            // Copiar endereço do usuário para a empresa se não fornecido
+            if (compania.getCep() == null) compania.setCep(user.getCep());
+            if (compania.getEndereco() == null) compania.setEndereco(user.getEndereco());
+            if (compania.getCidade() == null) compania.setCidade(user.getCidade());
+            if (compania.getEstado() == null) compania.setEstado(user.getEstado());
+
+            // Validar CNPJ único
+            if (request.getCnpj() != null && companiaRepository.existsByCnpj(request.getCnpj())) {
                 throw new BusinessException("CNPJ já cadastrado");
             }
-            organizador.setCnpj(request.getCnpj());
-        }
-        if (request.getNomeEmpresa() != null) {
-            organizador.setNomeEmpresa(request.getNomeEmpresa());
-        }
-        if (request.getDescricao() != null) {
-            organizador.setDescricao(request.getDescricao());
-        }
-        if (request.getSite() != null) {
-            organizador.setSite(request.getSite());
+
+            compania = companiaRepository.save(compania);
+
+            // Criar relacionamento user-compania como ADMIN
+            UserCompaniaEntity userCompania = new UserCompaniaEntity(user, compania, RoleCompania.ADMIN);
+            userCompaniaRepository.save(userCompania);
+        } else {
+            // Atualizar compania existente
+            compania = companias.get(0);
+            if (request.getNomeEmpresa() != null) {
+                compania.setNomeEmpresa(request.getNomeEmpresa());
+            }
+            if (request.getCnpj() != null && !request.getCnpj().equals(compania.getCnpj())) {
+                if (companiaRepository.existsByCnpj(request.getCnpj())) {
+                    throw new BusinessException("CNPJ já cadastrado");
+                }
+                compania.setCnpj(request.getCnpj());
+            }
+            if (request.getDescricao() != null) {
+                compania.setDescricao(request.getDescricao());
+            }
+            if (request.getSite() != null) {
+                compania.setSite(request.getSite());
+            }
+            compania = companiaRepository.save(compania);
         }
 
-        organizador.setUpdatedAt(LocalDateTime.now());
-        organizador = organizadorRepository.save(organizador);
+        // Salvar usuário
+        user = userRepository.save(user);
 
         CompleteProfileResponse response = new CompleteProfileResponse();
-        response.setId(organizador.getId());
-        response.setEmail(organizador.getEmail());
-        response.setNome(organizador.getNome());
-        response.setTelefone(organizador.getTelefone());
-        response.setCep(organizador.getCep());
-        response.setEndereco(organizador.getEndereco());
-        response.setCidade(organizador.getCidade());
-        response.setEstado(organizador.getEstado());
-        response.setCnpj(organizador.getCnpj());
-        response.setNomeEmpresa(organizador.getNomeEmpresa());
-        response.setDescricao(organizador.getDescricao());
-        response.setSite(organizador.getSite());
+        response.setId(user.getId());
+        response.setEmail(user.getEmail());
+        response.setNome(user.getFullName());
+        response.setTelefone(user.getPhone());
+        response.setCep(user.getCep());
+        response.setEndereco(user.getEndereco());
+        response.setCidade(user.getCidade());
+        response.setEstado(user.getEstado());
+        response.setCnpj(compania.getCnpj());
+        response.setNomeEmpresa(compania.getNomeEmpresa());
+        response.setDescricao(compania.getDescricao());
+        response.setSite(compania.getSite());
         response.setTipoUsuario(TipoUsuario.ORGANIZADOR);
-        response.setPerfilCompleto(isPerfilCompleto(organizador));
+        response.setPerfilCompleto(isPerfilCompletoOrganizador(user, compania));
 
         return response;
     }
 
-    private boolean isPerfilCompleto(Cliente cliente) {
-        return cliente.getNome() != null &&
-                cliente.getTelefone() != null &&
-                cliente.getEndereco() != null &&
-                cliente.getCidade() != null &&
-                cliente.getEstado() != null;
+    private boolean temDadosEmpresa(CompleteProfileRequest request) {
+        return request.getNomeEmpresa() != null ||
+                request.getCnpj() != null ||
+                request.getDescricao() != null ||
+                request.getSite() != null;
     }
 
-    private boolean isPerfilCompleto(Organizador organizador) {
-        return organizador.getNome() != null &&
-                organizador.getTelefone() != null &&
-                organizador.getNomeEmpresa() != null &&
-                organizador.getCnpj() != null &&
-                organizador.getEndereco() != null &&
-                organizador.getCidade() != null &&
-                organizador.getEstado() != null;
+    private boolean isPerfilCompletoCliente(UserEntity user) {
+        return user.getFullName() != null && !user.getFullName().trim().isEmpty() &&
+                user.getPhone() != null && !user.getPhone().trim().isEmpty() &&
+                user.getEndereco() != null && !user.getEndereco().trim().isEmpty() &&
+                user.getCidade() != null && !user.getCidade().trim().isEmpty() &&
+                user.getEstado() != null && !user.getEstado().trim().isEmpty();
+    }
+
+    private boolean isPerfilCompletoOrganizador(UserEntity user, CompaniaEntity compania) {
+        return isPerfilCompletoCliente(user) &&
+                compania.getNomeEmpresa() != null && !compania.getNomeEmpresa().trim().isEmpty() &&
+                compania.getCnpj() != null && !compania.getCnpj().trim().isEmpty();
     }
 }

@@ -67,9 +67,17 @@ public class Excursao extends BaseEntity {
     @Column(nullable = false)
     private StatusExcursao status = StatusExcursao.RASCUNHO;
 
+    // ============================================
+    // NOVOS RELACIONAMENTOS
+    // ============================================
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "organizador_id", nullable = false)
-    private Organizador organizador;
+    @JoinColumn(name = "compania_id", nullable = false)
+    private CompaniaEntity compania;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "criador_id", nullable = false)
+    private UserEntity criador;
 
     @OneToMany(mappedBy = "excursao", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Inscricao> inscricoes;
@@ -78,13 +86,14 @@ public class Excursao extends BaseEntity {
     public Excursao() {}
 
     public Excursao(String titulo, String descricao, LocalDateTime dataSaida, BigDecimal preco,
-                    Integer vagasTotal, Organizador organizador) {
+                    Integer vagasTotal, CompaniaEntity compania, UserEntity criador) {
         this.titulo = titulo;
         this.descricao = descricao;
         this.dataSaida = dataSaida;
         this.preco = preco;
         this.vagasTotal = vagasTotal;
-        this.organizador = organizador;
+        this.compania = compania;
+        this.criador = criador;
     }
 
     // Métodos auxiliares
@@ -143,8 +152,11 @@ public class Excursao extends BaseEntity {
     public StatusExcursao getStatus() { return status; }
     public void setStatus(StatusExcursao status) { this.status = status; }
 
-    public Organizador getOrganizador() { return organizador; }
-    public void setOrganizador(Organizador organizador) { this.organizador = organizador; }
+    public CompaniaEntity getCompania() { return compania; }
+    public void setCompania(CompaniaEntity compania) { this.compania = compania; }
+
+    public UserEntity getCriador() { return criador; }
+    public void setCriador(UserEntity criador) { this.criador = criador; }
 
     public List<Inscricao> getInscricoes() { return inscricoes; }
     public void setInscricoes(List<Inscricao> inscricoes) { this.inscricoes = inscricoes; }

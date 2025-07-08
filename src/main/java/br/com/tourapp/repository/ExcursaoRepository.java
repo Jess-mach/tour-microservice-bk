@@ -44,4 +44,10 @@ public interface ExcursaoRepository extends JpaRepository<Excursao, UUID> {
     @Query("SELECT e FROM Excursao e WHERE e.dataSaida BETWEEN :hoje AND :amanha AND e.status = 'ATIVA'")
     List<Excursao> findExcursoesProximasSaida(@Param("hoje") LocalDateTime hoje,
                                               @Param("amanha") LocalDateTime amanha);
+
+    //TODO resolver com a Claude
+    Page<Excursao> findByCompaniaIdAndStatus(UUID companiaId, StatusExcursao status, Pageable pageable);
+
+    //TODO resolver com a Claude
+    Page<Excursao> findByCompaniaId(UUID companiaId, Pageable pageable);
 }

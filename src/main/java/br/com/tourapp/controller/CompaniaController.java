@@ -196,7 +196,7 @@ public class CompaniaController {
         permissoes.setPodeVerFinanceiro(compania.getPodeVerFinanceiro());
         permissoes.setPodeEditarCompania(compania.getPodeEditarCompania());
         permissoes.setPodeEnviarNotificacoes(compania.getPodeEnviarNotificacoes());
-        permissoes.setRoleCompania(compania.getRoleUsuario());
+//        permissoes.setRoleCompania(compania.getRoleUsuario());  TODO resolver com a Claude
 
         return ResponseEntity.ok(permissoes);
     }

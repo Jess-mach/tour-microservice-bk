@@ -35,6 +35,8 @@ public class Inscricao extends BaseEntity {
     @OneToMany(mappedBy = "inscricao", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Pagamento> pagamentos;
 
+    //TODO companiaId //TODO resolver com a Claude
+
     // Construtores
     public Inscricao() {}
 

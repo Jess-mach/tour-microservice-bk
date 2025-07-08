@@ -4,8 +4,9 @@ import br.com.tourapp.dto.request.ExcursaoRequest;
 import br.com.tourapp.dto.response.ExcursaoResponse;
 import br.com.tourapp.enums.StatusExcursao;
 import br.com.tourapp.dto.SecurityUser;
-import br.com.tourapp.service.ExcursaoService;
+
 import br.com.tourapp.service.CompaniaSecurityService;
+import br.com.tourapp.service.ExcursaoUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,10 +25,10 @@ import java.util.UUID;
 @Tag(name = "Excursões", description = "Gestão de excursões pelo organizador")
 public class ExcursaoController {
 
-    private final ExcursaoService excursaoService;
+    private final ExcursaoUseCase excursaoService;
     private final CompaniaSecurityService securityService;
 
-    public ExcursaoController(ExcursaoService excursaoService, CompaniaSecurityService securityService) {
+    public ExcursaoController(ExcursaoUseCase excursaoService, CompaniaSecurityService securityService) {
         this.excursaoService = excursaoService;
         this.securityService = securityService;
     }
@@ -161,6 +162,7 @@ public class ExcursaoController {
 
         LoteOperacaoResponse response = excursaoService.alterarStatusLote(
                 request.getExcursaoIds(), request.getNovoStatus(), user.getId());
+
         return ResponseEntity.ok(response);
     }
 
@@ -223,6 +225,7 @@ public class ExcursaoController {
             @AuthenticationPrincipal SecurityUser user) {
 
         ExcursaoResponse response = excursaoService.duplicarExcursao(id, request, user.getId());
+
         return ResponseEntity.ok(response);
     }
 
@@ -235,6 +238,7 @@ public class ExcursaoController {
             @AuthenticationPrincipal SecurityUser user) {
 
         TemplateResponse response = excursaoService.salvarComoTemplate(id, request, user.getId());
+
         return ResponseEntity.ok(response);
     }
 

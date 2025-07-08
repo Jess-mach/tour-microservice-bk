@@ -2,11 +2,13 @@ package br.com.tourapp.controller;
 
 import br.com.tourapp.dto.response.DashboardResponse;
 import br.com.tourapp.dto.response.InscricaoResponse;
-import br.com.tourapp.dto.response.UserResponse;
-import br.com.tourapp.service.OrganizadorService;
+
+import br.com.tourapp.dto.response.UserInfoResponse;
 import br.com.tourapp.service.InscricaoService;
 import br.com.tourapp.service.CompaniaSecurityService;
 import br.com.tourapp.dto.SecurityUser;
+import br.com.tourapp.service.UserUseCase;
+import com.nimbusds.openid.connect.sdk.UserInfoRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
@@ -26,11 +28,11 @@ import java.util.UUID;
 @Tag(name = "Organizador", description = "Endpoints para organizadores de excursões")
 public class OrganizadorController {
 
-    private final OrganizadorService organizadorService;
+    private final UserUseCase organizadorService;
     private final InscricaoService inscricaoService;
     private final CompaniaSecurityService securityService;
 
-    public OrganizadorController(OrganizadorService organizadorService,
+    public OrganizadorController(UserUseCase organizadorService,
                                  InscricaoService inscricaoService,
                                  CompaniaSecurityService securityService) {
         this.organizadorService = organizadorService;
@@ -44,17 +46,17 @@ public class OrganizadorController {
 
     @GetMapping("/perfil")
     @Operation(summary = "Obter perfil", description = "Obtém o perfil do organizador")
-    public ResponseEntity<UserResponse> obterPerfil(@AuthenticationPrincipal SecurityUser user) {
-        UserResponse response = organizadorService.obterPerfil(user.getId());
+    public ResponseEntity<UserInfoResponse> obterPerfil(@AuthenticationPrincipal SecurityUser user) {
+        UserInfoResponse response = organizadorService.obterPerfil(user.getId());
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/perfil")
     @Operation(summary = "Atualizar perfil", description = "Atualiza dados do perfil do organizador")
-    public ResponseEntity<UserResponse> atualizarPerfil(
-            @RequestBody UserResponse request,
+    public ResponseEntity<UserInfoResponse> atualizarPerfil(
+            @RequestBody UserInfoRequest request,
             @AuthenticationPrincipal SecurityUser user) {
-        UserResponse response = organizadorService.atualizarPerfil(user.getId(), request);
+        UserInfoResponse response = organizadorService.atualizarPerfil(user.getId(), request);
         return ResponseEntity.ok(response);
     }
 
@@ -91,6 +93,7 @@ public class OrganizadorController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
 
         DashboardResponse response = organizadorService.obterDashboardConsolidado(user.getId(), dataInicio, dataFim);
+
         return ResponseEntity.ok(response);
     }
 
@@ -127,6 +130,7 @@ public class OrganizadorController {
 
         Page<InscricaoResponse> response = inscricaoService.listarInscricoesPorExcursao(
                 excursaoId, companiaId, user.getId(), pageable);
+
         return ResponseEntity.ok(response);
     }
 
@@ -148,6 +152,7 @@ public class OrganizadorController {
 
         ReceitaEstatisticasResponse response = organizadorService.obterEstatisticasReceita(
                 user.getId(), companiaId, dataInicio, dataFim);
+
         return ResponseEntity.ok(response);
     }
 
@@ -196,13 +201,16 @@ public class OrganizadorController {
 
     public static class ReceitaEstatisticasResponse {
         // Implementar campos necessários para estatísticas de receita
+        //TODO resolver com a Claude
     }
 
     public static class ExcursoesEstatisticasResponse {
+        //TODO resolver com a Claude
         // Implementar campos necessários para estatísticas de excursões
     }
 
     public static class RelatorioVendasResponse {
+        //TODO resolver com a Claude
         // Implementar campos necessários para relatório de vendas
     }
 }

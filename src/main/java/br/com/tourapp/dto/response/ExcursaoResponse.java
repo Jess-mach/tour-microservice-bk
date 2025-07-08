@@ -1,6 +1,8 @@
 package br.com.tourapp.dto.response;
 
 import br.com.tourapp.enums.StatusExcursao;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -33,6 +35,8 @@ public class ExcursaoResponse {
     private String nomeOrganizador;
     private String emailOrganizador;
     private String telefoneOrganizador;
+    private CompaniaResponse compania;
+    private UserInfoResponse criador;
 
     // Construtores
     public ExcursaoResponse() {}
@@ -97,5 +101,37 @@ public class ExcursaoResponse {
 
     public String getTelefoneOrganizador() { return telefoneOrganizador; }
     public void setTelefoneOrganizador(String telefoneOrganizador) { this.telefoneOrganizador = telefoneOrganizador; }
+
+    public void setCompaniaId(UUID id) {
+        this.compania.setId(id);
+    }
+
+    public void setNomeCompania(@NotBlank(message = "Nome da empresa é obrigatório") @Size(min = 2, max = 150, message = "Nome da empresa deve ter entre 2 e 150 caracteres") String nomeEmpresa) {
+        this.compania.setNomeEmpresa(nomeEmpresa);
+    }
+
+    public void setCriadorId(UUID id) {
+        if (this.criador == null) {
+            this.criador = UserInfoResponse.builder()
+                    .id(id)
+                    .build();
+        } else {
+            this.criador = this.criador.toBuilder()
+                    .id(id)
+                    .build();
+        }
+    }
+
+    public void setNomeCriador(@NotBlank(message = "Nome é obrigatório") @Size(min = 2, max = 100, message = "Nome deve ter entre 2 e 100 caracteres") String fullName) {
+        if (this.criador == null) {
+            this.criador = UserInfoResponse.builder()
+                    .fullName(fullName)
+                    .build();
+        } else {
+            this.criador = this.criador.toBuilder()
+                    .fullName(fullName)
+                    .build();
+        }
+    }
 }
 

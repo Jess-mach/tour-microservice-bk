@@ -78,7 +78,7 @@ public class EmailService {
             Context context = new Context();
             context.setVariable("titulo", notificacao.getTitulo());
             context.setVariable("mensagem", notificacao.getMensagem());
-            context.setVariable("nomeOrganizador", notificacao.getOrganizador().getNomeEmpresa());
+            context.setVariable("nomeOrganizador", "TODO notificacao.getOrganizador().getNomeEmpresa()"); //TODO resolver com a Claude
 
             String htmlContent = templateEngine.process("email/notificacao-personalizada", context);
 

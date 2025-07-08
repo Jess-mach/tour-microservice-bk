@@ -2,7 +2,7 @@ package br.com.tourapp.service;
 
 import br.com.tourapp.dto.request.NotificacaoRequest;
 import br.com.tourapp.dto.response.NotificacaoResponse;
-import br.com.tourapp.entity.Cliente;
+import br.com.tourapp.dto.response.UserInfoResponse;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,5 +17,5 @@ public interface NotificationUseCase {
 
     Page<NotificacaoResponse> listarNotificacoesPorOrganizador(UUID id, Pageable pageable);
 
-    List<Cliente> listarClientesPorExcursao(UUID excursaoId, UUID id);
+    List<UserInfoResponse> listarClientesPorExcursao(UUID excursaoId, UUID id);
 }

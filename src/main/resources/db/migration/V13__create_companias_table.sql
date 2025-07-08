@@ -338,15 +338,6 @@ ALTER TABLE user_compania ADD CONSTRAINT chk_user_compania_data_aceite
 -- ===========================================
 -- Criar triggers para auditoria e manutenção
 
--- Trigger para atualizar updated_at automaticamente
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $
-BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
-    RETURN NEW;
-END;
-$ language 'plpgsql';
-
 -- Aplicar trigger nas tabelas principais
 CREATE TRIGGER update_users_updated_at
     BEFORE UPDATE ON users
@@ -513,52 +504,3 @@ CREATE INDEX idx_users_active_created_at ON users(active, created_at);
 CREATE INDEX idx_users_email_notifications ON users(email_notifications) WHERE email_notifications = true;
 CREATE INDEX idx_users_push_token ON users(push_token) WHERE push_token IS NOT NULL;
 
--- ===========================================
--- SCRIPT DE VALIDAÇÃO (Para executar após as migrations)
--- ===========================================
-
--- Validar integridade dos dados migrados
-DO $
-DECLARE
-    total_organizadores INTEGER;
-    total_companias INTEGER;
-    total_user_compania INTEGER;
-    total_clientes INTEGER;
-    total_users_clientes INTEGER;
-BEGIN
-    -- Contar registros
-    SELECT COUNT(*) INTO total_organizadores FROM organizadores;
-    SELECT COUNT(*) INTO total_companias FROM companias;
-    SELECT COUNT(*) INTO total_user_compania FROM user_compania;
-
-    RAISE NOTICE 'Organizadores migrados: %', total_organizadores;
-    RAISE NOTICE 'Companias criadas: %', total_companias;
-    RAISE NOTICE 'Relacionamentos user-compania: %', total_user_compania;
-
-    -- Verificar se todos os organizadores têm compania
-    IF total_organizadores > total_user_compania THEN
-        RAISE WARNING 'Alguns organizadores podem não ter sido migrados corretamente!';
-    END IF;
-
-    -- Verificar clientes
-    SELECT COUNT(*) FROM clientes INTO total_clientes;
-    SELECT COUNT(*) FROM users u
-    JOIN user_roles ur ON ur.user_id = u.id
-    JOIN roles r ON r.id = ur.role_id
-    WHERE r.name = 'ROLE_CLIENTE' INTO total_users_clientes;
-
-    RAISE NOTICE 'Clientes migrados: %', total_clientes;
-    RAISE NOTICE 'Users com ROLE_CLIENTE: %', total_users_clientes;
-
-    -- Verificar excursões
-    IF EXISTS (SELECT 1 FROM excursoes WHERE compania_id IS NULL) THEN
-        RAISE WARNING 'Existem excursões sem compania associada!';
-    END IF;
-
-    -- Verificar inscrições
-    IF EXISTS (SELECT 1 FROM inscricoes WHERE user_id IS NULL) THEN
-        RAISE WARNING 'Existem inscrições sem usuário associado!';
-    END IF;
-
-    RAISE NOTICE 'Validação concluída!';
-END $;

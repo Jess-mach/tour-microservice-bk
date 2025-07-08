@@ -221,5 +221,9 @@ public class UserEntity extends BaseEntity {
         this.estado = estado;
     }
 
+    public String getNome() {
+        return this.fullName;
+    }
+
     // Override do equals e hashCode da BaseEntity são mantidos
 }

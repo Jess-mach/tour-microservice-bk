@@ -1,7 +1,9 @@
 package br.com.tourapp.service;
 
 import br.com.tourapp.config.security.GoogleTokenVerifier;
+import br.com.tourapp.controller.OrganizadorController;
 import br.com.tourapp.dto.GoogleUserInfo;
+import br.com.tourapp.dto.response.DashboardResponse;
 import br.com.tourapp.dto.response.JwtResponse;
 import br.com.tourapp.dto.response.UserInfoResponse;
 import br.com.tourapp.entity.RoleEntity;
@@ -10,6 +12,7 @@ import br.com.tourapp.repository.RoleRepository;
 import br.com.tourapp.repository.UserRepository;
 import br.com.tourapp.dto.SecurityUser;
 import br.com.tourapp.util.JwtUtils;
+import com.nimbusds.openid.connect.sdk.UserInfoRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,9 +21,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -111,6 +116,56 @@ public class UserService implements UserUseCase {
                 hasActiveSubscription,
                 true
         );
+    }
+
+    @Override
+    public UserInfoResponse obterPerfil(UUID id) {
+        return null; //TODO resolver com a Claude
+    }
+
+    @Override
+    public UserInfoResponse atualizarPerfil(UUID id, UserInfoRequest request) {
+        return null; //TODO resolver com a Claude
+    }
+
+    @Override
+    public DashboardResponse obterDashboard(UUID id, UUID companiaId, LocalDate dataInicio, LocalDate dataFim) {
+        return null;//TODO resolver com a Claude
+    }
+
+    @Override
+    public DashboardResponse obterDashboardConsolidado(UUID id, LocalDate dataInicio, LocalDate dataFim) {
+        return null;//TODO resolver com a Claude
+    }
+
+    @Override
+    public UserEntity obterPorId(UUID clienteId) {
+        return null;//TODO resolver com a Claude
+    }
+
+    @Override
+    public void atualizarPushToken(UUID id, String pushToken) {
+//TODO resolver com a Claude
+    }
+
+    @Override
+    public void atualizarConfiguracoes(UUID id, Boolean emailNotifications, Boolean smsNotifications) {
+//TODO resolver com a Claude
+    }
+
+    @Override
+    public OrganizadorController.ReceitaEstatisticasResponse obterEstatisticasReceita(UUID id, UUID companiaId, LocalDate dataInicio, LocalDate dataFim) {
+        return null;//TODO resolver com a Claude
+    }
+
+    @Override
+    public OrganizadorController.ExcursoesEstatisticasResponse obterEstatisticasExcursoes(UUID id, UUID companiaId, LocalDate dataInicio, LocalDate dataFim) {
+        return null;//TODO resolver com a Claude
+    }
+
+    @Override
+    public OrganizadorController.RelatorioVendasResponse gerarRelatorioVendas(UUID id, UUID companiaId, LocalDate dataInicio, LocalDate dataFim, Boolean incluirDetalhado) {
+        return null;//TODO resolver com a Claude
     }
 
     /**

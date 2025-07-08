@@ -2,9 +2,9 @@ package br.com.tourapp.service;
 
 import br.com.tourapp.dto.request.InscricaoRequest;
 import br.com.tourapp.dto.response.InscricaoResponse;
-import br.com.tourapp.entity.Cliente;
 import br.com.tourapp.entity.Excursao;
 import br.com.tourapp.entity.Inscricao;
+import br.com.tourapp.entity.UserEntity;
 import br.com.tourapp.enums.StatusExcursao;
 import br.com.tourapp.enums.StatusPagamento;
 import br.com.tourapp.exception.BusinessException;
@@ -24,13 +24,13 @@ public class InscricaoService {
 
     private final InscricaoRepository inscricaoRepository;
     private final ExcursaoService excursaoService;
-    private final ClienteService clienteService;
+    private final UserUseCase clienteService;
     private final EmailService emailService;
     private final ModelMapper modelMapper;
 
     public InscricaoService(InscricaoRepository inscricaoRepository,
                             ExcursaoService excursaoService,
-                            ClienteService clienteService,
+                            UserUseCase clienteService,
                             EmailService emailService,
                             ModelMapper modelMapper) {
         this.inscricaoRepository = inscricaoRepository;
@@ -42,7 +42,7 @@ public class InscricaoService {
 
     public InscricaoResponse criarInscricao(UUID excursaoId, InscricaoRequest request, UUID clienteId) {
         Excursao excursao = excursaoService.obterPorId(excursaoId);
-        Cliente cliente = clienteService.obterPorId(clienteId);
+        UserEntity cliente = clienteService.obterPorId(clienteId);
 
         // Validações
         if (!excursao.isAtiva()) {
@@ -94,15 +94,16 @@ public class InscricaoService {
     }
 
     @Transactional(readOnly = true)
-    public Page<InscricaoResponse> listarInscricoesPorOrganizador(UUID organizadorId, UUID excursaoId, Pageable pageable) {
-        return inscricaoRepository.findByOrganizadorIdAndExcursaoId(organizadorId, excursaoId, pageable)
+    public Page<InscricaoResponse> listarInscricoesPorOrganizador(UUID organizadorId, UUID companiaId, UUID excursaoId, Pageable pageable) {
+        return inscricaoRepository //TODO companiaId //TODO resolver com a Claude
+                .findByOrganizadorIdAndExcursaoId(organizadorId, excursaoId, pageable)
                 .map(this::converterParaResponse);
     }
 
     @Transactional(readOnly = true)
-    public Page<InscricaoResponse> listarInscricoesPorExcursao(UUID excursaoId, UUID organizadorId, Pageable pageable) {
-        // Verificar se a excursão pertence ao organizador
-        excursaoService.obterExcursaoPorOrganizador(excursaoId, organizadorId);
+    public Page<InscricaoResponse> listarInscricoesPorExcursao(UUID excursaoId, UUID companiaId, UUID organizadorId, Pageable pageable) {
+        // Verificar se a excursão pertence ao organizador //TODO resolver com a Claude
+        excursaoService.obterExcursaoPorOrganizador(excursaoId, organizadorId); //TODO companiaId TODO resolver com a Claude
 
         Page<Inscricao> inscricoes = inscricaoRepository.findByExcursaoId(excursaoId, pageable);
         return inscricoes.map(this::converterParaResponse);
@@ -129,9 +130,9 @@ public class InscricaoService {
         InscricaoResponse response = modelMapper.map(inscricao, InscricaoResponse.class);
         response.setTituloExcursao(inscricao.getExcursao().getTitulo());
         response.setDataSaidaExcursao(inscricao.getExcursao().getDataSaida());
-        response.setNomeCliente(inscricao.getCliente().getNome());
+        response.setNomeCliente(inscricao.getCliente().getFullName());
         response.setEmailCliente(inscricao.getCliente().getEmail());
-        response.setTelefoneCliente(inscricao.getCliente().getTelefone());
+        response.setTelefoneCliente(inscricao.getCliente().getPhone());
         return response;
     }
 }

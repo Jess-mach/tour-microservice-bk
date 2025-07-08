@@ -3,15 +3,15 @@ package br.com.tourapp.service;
 
 import br.com.tourapp.dto.request.NotificacaoRequest;
 import br.com.tourapp.dto.response.NotificacaoResponse;
-import br.com.tourapp.entity.Cliente;
+import br.com.tourapp.dto.response.UserInfoResponse;
 import br.com.tourapp.entity.Excursao;
 import br.com.tourapp.entity.Notificacao;
-import br.com.tourapp.entity.Organizador;
+import br.com.tourapp.entity.UserEntity;
 import br.com.tourapp.enums.TipoNotificacao;
 import br.com.tourapp.exception.BusinessException;
 import br.com.tourapp.exception.NotFoundException;
-import br.com.tourapp.repository.ClienteRepository;
 import br.com.tourapp.repository.NotificacaoRepository;
+import br.com.tourapp.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,22 +34,19 @@ public class NotificacaoService implements NotificationUseCase {
     private static final Logger logger = LoggerFactory.getLogger(NotificacaoService.class);
 
     private final NotificacaoRepository notificacaoRepository;
-    private final OrganizadorService organizadorService;
     private final ExcursaoService excursaoService;
-    private final ClienteRepository clienteRepository;
+    private final UserRepository clienteRepository;
     private final EmailService emailService;
     private final FirebaseService firebaseService;
     private final ModelMapper modelMapper;
 
     public NotificacaoService(NotificacaoRepository notificacaoRepository,
-                              OrganizadorService organizadorService,
                               ExcursaoService excursaoService,
-                              ClienteRepository clienteRepository,
+                              UserRepository clienteRepository,
                               EmailService emailService,
                               FirebaseService firebaseService,
                               ModelMapper modelMapper) {
         this.notificacaoRepository = notificacaoRepository;
-        this.organizadorService = organizadorService;
         this.excursaoService = excursaoService;
         this.clienteRepository = clienteRepository;
         this.emailService = emailService;
@@ -57,10 +54,13 @@ public class NotificacaoService implements NotificationUseCase {
         this.modelMapper = modelMapper;
     }
 
+    @Override
     public NotificacaoResponse criarNotificacao(NotificacaoRequest request, UUID organizadorId) {
         logger.info("Criando notificação para organizador: {}", organizadorId);
 
-        Organizador organizador = organizadorService.obterPorId(organizadorId);
+        //TODO resolver com a Claude
+        UserEntity organizador = clienteRepository.findById(organizadorId)
+                .orElseThrow(() -> new NotFoundException("Organizador não encontrado"));
 
         // Validações de negócio
         validarNotificacao(request, organizadorId);
@@ -90,7 +90,7 @@ public class NotificacaoService implements NotificationUseCase {
         // Definir clientes alvo
         if (!notificacao.getEnviarParaTodos() && request.getClientesAlvo() != null && !request.getClientesAlvo().isEmpty()) {
             // Validar se todos os clientes existem
-            List<Cliente> clientesValidos = clienteRepository.findAllById(request.getClientesAlvo());
+            List<UserEntity> clientesValidos = clienteRepository.findAllById(request.getClientesAlvo());
             if (clientesValidos.size() != request.getClientesAlvo().size()) {
                 throw new BusinessException("Alguns clientes especificados não foram encontrados");
             }
@@ -129,7 +129,7 @@ public class NotificacaoService implements NotificationUseCase {
 
         try {
             // Obter lista de clientes destinatários
-            List<Cliente> destinatarios = obterDestinatarios(notificacao);
+            List<UserEntity> destinatarios = obterDestinatarios(notificacao);
 
             if (destinatarios.isEmpty()) {
                 throw new BusinessException("Nenhum cliente encontrado para enviar a notificação");
@@ -188,13 +188,17 @@ public class NotificacaoService implements NotificationUseCase {
     }
 
     @Transactional(readOnly = true)
-    public List<Cliente> listarClientesPorExcursao(UUID excursaoId, UUID organizadorId) {
+    public List<UserInfoResponse> listarClientesPorExcursao(UUID excursaoId, UUID organizadorId) {
         logger.info("Listando clientes da excursão: {} do organizador: {}", excursaoId, organizadorId);
 
         // Verificar se a excursão pertence ao organizador
         excursaoService.obterExcursaoPorOrganizador(excursaoId, organizadorId);
 
-        return clienteRepository.findByExcursaoId(excursaoId);
+        //TODO resolver com a Claude
+        return clienteRepository.findByExcursaoId(excursaoId)
+                .stream()
+                .map(cliente -> modelMapper.map(cliente, UserInfoResponse.class))
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -247,8 +251,8 @@ public class NotificacaoService implements NotificationUseCase {
         }
     }
 
-    private List<Cliente> obterDestinatarios(Notificacao notificacao) {
-        List<Cliente> destinatarios = new ArrayList<>();
+    private List<UserEntity> obterDestinatarios(Notificacao notificacao) {
+        List<UserEntity> destinatarios = new ArrayList<>();
 
         if (notificacao.getEnviarParaTodos()) {
             if (notificacao.getExcursao() != null) {
@@ -268,30 +272,30 @@ public class NotificacaoService implements NotificationUseCase {
 
         // Filtrar apenas clientes ativos
         return destinatarios.stream()
-                .filter(Cliente::getAtivo)
+                .filter(UserEntity::isAtivo)
                 .collect(Collectors.toList());
     }
 
-    private List<String> filtrarEmailsValidos(List<Cliente> clientes) {
+    private List<String> filtrarEmailsValidos(List<UserEntity> clientes) {
         return clientes.stream()
                 .filter(cliente -> cliente.getEmailNotifications() != null && cliente.getEmailNotifications())
                 .filter(cliente -> cliente.getEmail() != null && !cliente.getEmail().trim().isEmpty())
-                .map(Cliente::getEmail)
+                .map(UserEntity::getEmail)
                 .distinct()
                 .collect(Collectors.toList());
     }
 
-    private List<String> filtrarPushTokensValidos(List<Cliente> clientes) {
+    private List<String> filtrarPushTokensValidos(List<UserEntity> clientes) {
         return clientes.stream()
                 .filter(cliente -> cliente.getPushToken() != null && !cliente.getPushToken().trim().isEmpty())
-                .map(Cliente::getPushToken)
+                .map(UserEntity::getPushToken)
                 .distinct()
                 .collect(Collectors.toList());
     }
 
     private Long calcularTotalDestinatarios(Notificacao notificacao) {
         try {
-            List<Cliente> destinatarios = obterDestinatarios(notificacao);
+            List<UserEntity> destinatarios = obterDestinatarios(notificacao);
             return (long) destinatarios.size();
         } catch (Exception e) {
             logger.warn("Erro ao calcular total de destinatários para notificação {}: {}",
@@ -331,7 +335,7 @@ public class NotificacaoService implements NotificationUseCase {
 
         try {
             // Buscar a excursão e seus inscritos
-            List<Cliente> inscritos = clienteRepository.findByExcursaoId(excursaoId);
+            List<UserEntity> inscritos = clienteRepository.findByExcursaoId(excursaoId);
 
             if (inscritos.isEmpty()) {
                 logger.info("Nenhum inscrito encontrado para a excursão: {}", excursaoId);

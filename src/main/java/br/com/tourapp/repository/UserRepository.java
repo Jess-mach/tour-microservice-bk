@@ -166,4 +166,8 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
     @Query("SELECT u FROM UserEntity u " +
             "WHERE u.id IN :userIds AND u.pushToken IS NOT NULL AND u.active = true")
     List<UserEntity> findByIdsWithPushToken(@Param("userIds") List<UUID> userIds);
+
+    @Query("SELECT u FROM UserEntity u " +
+            "WHERE  u.smsNotifications = true AND u.active = true")
+    List<UserEntity> findByAtivoTrue();
 }

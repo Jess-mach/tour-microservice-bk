@@ -366,21 +366,21 @@ public class CompaniaService {
     private CompaniaResponse converterParaResponse(CompaniaEntity compania, UUID userId) {
         CompaniaResponse response = modelMapper.map(compania, CompaniaResponse.class);
 
-        // Adicionar dados estatísticos
-        response.setTotalUsuarios(userCompaniaRepository.countActiveUsersByCompania(compania.getId()));
-        response.setTotalExcursoes(companiaRepository.countExcursoesAtivas(compania.getId()));
-        response.setPerfilCompleto(compania.isPerfilCompleto());
+        // Adicionar dados estatísticos TODO resolver com a Claude
+//        response.setTotalUsuarios(userCompaniaRepository.countActiveUsersByCompania(compania.getId()));
+//        response.setTotalExcursoes(companiaRepository.countExcursoesAtivas(compania.getId()));
+//        response.setPerfilCompleto(compania.isPerfilCompleto());
 
         // Adicionar dados do usuário na compania
         userCompaniaRepository.findByUserAndCompania(userId, compania.getId())
                 .ifPresent(uc -> {
-                    response.setRoleUsuario(uc.getRoleCompania().name());
+//                    response.setRoleUsuario(uc.getRoleCompania().name()); TODO resolver com a Claude
                     response.setPodeCreiarExcursoes(uc.getPodeCreiarExcursoes());
                     response.setPodeGerenciarUsuarios(uc.getPodeGerenciarUsuarios());
                     response.setPodeVerFinanceiro(uc.getPodeVerFinanceiro());
                     response.setPodeEditarCompania(uc.getPodeEditarCompania());
                     response.setPodeEnviarNotificacoes(uc.getPodeEnviarNotificacoes());
-                    response.setDataIngresso(uc.getDataIngresso());
+//                    response.setDataIngresso(uc.getDataIngresso()); TODO resolver com a Claude
                 });
 
         return response;
@@ -395,7 +395,7 @@ public class CompaniaService {
         response.setEmailUsuario(userCompania.getUser().getEmail());
         response.setTelefoneUsuario(userCompania.getUser().getPhone());
         response.setNomeEmpresa(userCompania.getCompania().getNomeEmpresa());
-        response.setStatusCompania(userCompania.getCompania().getStatus().name());
+//        response.setStatusCompania(userCompania.getCompania().getStatus().name()); TODO resolver posteriormnte
         response.setIsConvitePendente(userCompania.isConvidado());
 
         return response;

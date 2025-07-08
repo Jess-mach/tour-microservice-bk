@@ -2,7 +2,7 @@ package br.com.tourapp.controller;
 
 import br.com.tourapp.dto.request.NotificacaoRequest;
 import br.com.tourapp.dto.response.NotificacaoResponse;
-import br.com.tourapp.entity.Cliente;
+import br.com.tourapp.dto.response.UserInfoResponse;
 import br.com.tourapp.service.NotificationUseCase;
 import br.com.tourapp.dto.SecurityUser;
 import jakarta.validation.Valid;
@@ -52,10 +52,10 @@ public class NotificacaoController {
     }
 
     @GetMapping("/clientes/{excursaoId}")
-    public ResponseEntity<List<Cliente>> listarClientesPorExcursao(
+    public ResponseEntity<List<UserInfoResponse>> listarClientesPorExcursao(
             @PathVariable UUID excursaoId,
             @AuthenticationPrincipal SecurityUser user) {
-        List<Cliente> response = notificacaoService.listarClientesPorExcursao(excursaoId, user.getId());
+        List<UserInfoResponse> response = notificacaoService.listarClientesPorExcursao(excursaoId, user.getId());
         return ResponseEntity.ok(response);
     }
 }

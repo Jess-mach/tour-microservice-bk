@@ -1,5 +1,6 @@
 package br.com.tourapp.service;
 
+import br.com.tourapp.controller.ExcursaoController;
 import br.com.tourapp.dto.request.ExcursaoRequest;
 import br.com.tourapp.dto.response.ExcursaoResponse;
 import br.com.tourapp.entity.Excursao;
@@ -25,7 +26,7 @@ import java.util.UUID;
 
 @Service
 @Transactional
-public class ExcursaoService {
+public class ExcursaoService implements ExcursaoUseCase {
 
     private final ExcursaoRepository excursaoRepository;
     private final CompaniaRepository companiaRepository;
@@ -108,6 +109,36 @@ public class ExcursaoService {
         return excursoes.map(this::converterParaResponse);
     }
 
+    @Override
+    public ExcursaoController.LoteOperacaoResponse alterarStatusLote(List<UUID> excursaoIds, StatusExcursao novoStatus, UUID id) {
+        return null; //TODO resolver com a Claude
+    }
+
+    @Override
+    public ExcursaoController.LoteOperacaoResponse excluirExcursoesLote(List<UUID> excursaoIds, UUID id) {
+        return null;//TODO resolver com a Claude
+    }
+
+    @Override
+    public ExcursaoController.ExcursaoEstatisticasResponse obterEstatisticasExcursao(UUID id, UUID id1) {
+        return null;//TODO resolver com a Claude
+    }
+
+    @Override
+    public ExcursaoController.ResumoEstatisticasResponse obterResumoEstatisticas(UUID id, UUID companiaId) {
+        return null;//TODO resolver com a Claude
+    }
+
+    @Override
+    public ExcursaoResponse duplicarExcursao(UUID id, ExcursaoController.DuplicarExcursaoRequest request, UUID id1) {
+        return null;//TODO resolver com a Claude
+    }
+
+    @Override
+    public ExcursaoController.TemplateResponse salvarComoTemplate(UUID id, ExcursaoController.SalvarTemplateRequest request, UUID id1) {
+        return null;//TODO resolver com a Claude
+    }
+
     @Transactional(readOnly = true)
     @Cacheable(value = "excursoes", key = "#organizadorId + '_' + #status + '_' + #pageable.pageNumber")
     public Page<ExcursaoResponse> listarExcursoesPorOrganizador(UUID organizadorId, StatusExcursao status, Pageable pageable) {
@@ -167,8 +198,9 @@ public class ExcursaoService {
 
         // Verificar se o usuário tem acesso a esta excursão
         List<CompaniaEntity> companias = companiaRepository.findByUserId(organizadorId);
+        Excursao finalExcursao = excursao; //TODO resolver com a Claude
         boolean temAcesso = companias.stream()
-                .anyMatch(c -> c.getId().equals(excursao.getCompania().getId()));
+                .anyMatch(c -> c.getId().equals(finalExcursao.getCompania().getId()));
 
         if (!temAcesso) {
             throw new NotFoundException("Excursão não encontrada");
@@ -210,8 +242,9 @@ public class ExcursaoService {
 
         // Verificar se o usuário tem acesso a esta excursão
         List<CompaniaEntity> companias = companiaRepository.findByUserId(organizadorId);
+        Excursao finalExcursao = excursao; //TODO resolver com a Claude
         boolean temAcesso = companias.stream()
-                .anyMatch(c -> c.getId().equals(excursao.getCompania().getId()));
+                .anyMatch(c -> c.getId().equals(finalExcursao.getCompania().getId()));
 
         if (!temAcesso) {
             throw new NotFoundException("Excursão não encontrada");

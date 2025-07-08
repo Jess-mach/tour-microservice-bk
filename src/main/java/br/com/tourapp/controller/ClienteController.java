@@ -1,10 +1,11 @@
 package br.com.tourapp.controller;
 
-import br.com.tourapp.dto.response.ClienteResponse;
 import br.com.tourapp.dto.response.InscricaoResponse;
-import br.com.tourapp.service.ClienteService;
+import br.com.tourapp.dto.response.UserInfoResponse;
 import br.com.tourapp.service.InscricaoService;
 import br.com.tourapp.dto.SecurityUser;
+import br.com.tourapp.service.UserUseCase;
+import com.nimbusds.openid.connect.sdk.UserInfoRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -19,25 +20,25 @@ import java.util.UUID;
 @PreAuthorize("hasRole('CLIENTE')")
 public class ClienteController {
 
-    private final ClienteService clienteService;
+    private final UserUseCase clienteService;
     private final InscricaoService inscricaoService;
 
-    public ClienteController(ClienteService clienteService, InscricaoService inscricaoService) {
+    public ClienteController(UserUseCase clienteService, InscricaoService inscricaoService) {
         this.clienteService = clienteService;
         this.inscricaoService = inscricaoService;
     }
 
     @GetMapping("/perfil")
-    public ResponseEntity<ClienteResponse> obterPerfil(@AuthenticationPrincipal SecurityUser user) {
-        ClienteResponse response = clienteService.obterPerfil(user.getId());
+    public ResponseEntity<UserInfoResponse> obterPerfil(@AuthenticationPrincipal SecurityUser user) {
+        UserInfoResponse response = clienteService.obterPerfil(user.getId());
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/perfil")
-    public ResponseEntity<ClienteResponse> atualizarPerfil(
-            @RequestBody ClienteResponse request,
+    public ResponseEntity<UserInfoResponse> atualizarPerfil(
+            @RequestBody UserInfoRequest request,
             @AuthenticationPrincipal SecurityUser user) {
-        ClienteResponse response = clienteService.atualizarPerfil(user.getId(), request);
+        UserInfoResponse response = clienteService.atualizarPerfil(user.getId(), request);
         return ResponseEntity.ok(response);
     }
 

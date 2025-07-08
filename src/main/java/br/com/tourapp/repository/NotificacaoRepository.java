@@ -19,7 +19,7 @@ public interface NotificacaoRepository extends JpaRepository<Notificacao, UUID> 
 
     Page<Notificacao> findByOrganizadorId(UUID organizadorId, Pageable pageable);
 
-    List<Notificacao> findByOrganizadorIdAndEnviadaFalse(UUID organizadorId);
+//    List<Notificacao> findByOrganizadorIdAndEnviadaFalse(UUID organizadorId);
 
     @Query("SELECT n FROM Notificacao n WHERE n.organizador.id = :organizadorId AND n.id = :notificacaoId")
     Notificacao findByIdAndOrganizadorId(@Param("notificacaoId") UUID notificacaoId,

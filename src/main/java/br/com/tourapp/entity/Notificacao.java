@@ -19,7 +19,7 @@ public class Notificacao extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "criador_id", nullable = false)
-    private UserEntity criador;
+    private UserEntity organizador;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "excursao_id")
@@ -56,9 +56,9 @@ public class Notificacao extends BaseEntity {
     // Construtores
     public Notificacao() {}
 
-    public Notificacao(CompaniaEntity compania, UserEntity criador, String titulo, String mensagem, TipoNotificacao tipo) {
+    public Notificacao(CompaniaEntity compania, UserEntity organizador, String titulo, String mensagem, TipoNotificacao tipo) {
         this.compania = compania;
-        this.criador = criador;
+        this.organizador = organizador;
         this.titulo = titulo;
         this.mensagem = mensagem;
         this.tipo = tipo;
@@ -75,19 +75,19 @@ public class Notificacao extends BaseEntity {
 
     // Métodos de compatibilidade
     public UserEntity getOrganizador() {
-        return criador;
+        return organizador;
     }
 
     public void setOrganizador(UserEntity criador) {
-        this.criador = criador;
+        this.organizador = criador;
     }
 
     // Getters e Setters
     public CompaniaEntity getCompania() { return compania; }
     public void setCompania(CompaniaEntity compania) { this.compania = compania; }
 
-    public UserEntity getCriador() { return criador; }
-    public void setCriador(UserEntity criador) { this.criador = criador; }
+    public UserEntity getCriador() { return organizador; }
+    public void setCriador(UserEntity organizador) { this.organizador = organizador; }
 
     public Excursao getExcursao() { return excursao; }
     public void setExcursao(Excursao excursao) { this.excursao = excursao; }

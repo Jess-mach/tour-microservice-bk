@@ -22,7 +22,7 @@ public interface InscricaoRepository extends JpaRepository<Inscricao, UUID> {
 
     Page<Inscricao> findByExcursaoId(UUID excursaoId, Pageable pageable);
 
-    @Query("SELECT i FROM Inscricao i WHERE i.cliente.id = :clienteId AND i.id = :inscricaoId")
+    @Query("SELECT i FROM Inscricao i WHERE i.user.id = :clienteId AND i.id = :inscricaoId")
     Optional<Inscricao> findByIdAndClienteId(@Param("inscricaoId") UUID inscricaoId,
                                              @Param("clienteId") UUID clienteId);
 
@@ -35,6 +35,7 @@ public interface InscricaoRepository extends JpaRepository<Inscricao, UUID> {
                                                      @Param("excursaoId") UUID excursaoId,
                                                      Pageable pageable);
 
+    @Query("SELECT i FROM Inscricao i WHERE i.excursao.id = :excursaoId AND i.user.id = :clienteId")
     boolean existsByClienteIdAndExcursaoId(UUID clienteId, UUID excursaoId);
 
     @Query("SELECT COUNT(i) FROM Inscricao i WHERE i.excursao.id = :excursaoId AND i.statusPagamento = 'APROVADO'")

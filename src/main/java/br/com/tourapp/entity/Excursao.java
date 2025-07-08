@@ -77,7 +77,7 @@ public class Excursao extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "criador_id", nullable = false)
-    private UserEntity criador;
+    private UserEntity organizador;
 
     @OneToMany(mappedBy = "excursao", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Inscricao> inscricoes;
@@ -93,7 +93,7 @@ public class Excursao extends BaseEntity {
         this.preco = preco;
         this.vagasTotal = vagasTotal;
         this.compania = compania;
-        this.criador = criador;
+        this.organizador = criador;
     }
 
     // Métodos auxiliares
@@ -155,8 +155,8 @@ public class Excursao extends BaseEntity {
     public CompaniaEntity getCompania() { return compania; }
     public void setCompania(CompaniaEntity compania) { this.compania = compania; }
 
-    public UserEntity getCriador() { return criador; }
-    public void setCriador(UserEntity criador) { this.criador = criador; }
+    public UserEntity getCriador() { return organizador; }
+    public void setCriador(UserEntity criador) { this.organizador = criador; }
 
     public List<Inscricao> getInscricoes() { return inscricoes; }
     public void setInscricoes(List<Inscricao> inscricoes) { this.inscricoes = inscricoes; }

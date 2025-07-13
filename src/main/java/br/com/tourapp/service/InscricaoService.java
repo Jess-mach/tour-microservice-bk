@@ -82,46 +82,6 @@ public class InscricaoService {
         return response;
     }
 
-
-    public InscricaoResponse criarInscricao(UUID excursaoId, InscricaoRequest request, UUID clienteId) {
-        Excursao excursao = excursaoService.obterPorId(excursaoId);
-        UserEntity cliente = clienteService.obterPorId(clienteId);
-
-        // Validações
-        if (!excursao.isAtiva()) {
-            throw new BusinessException("Excursão não está disponível para inscrições");
-        }
-
-        if (!excursao.temVagasDisponiveis()) {
-            throw new BusinessException("Excursão está lotada");
-        }
-
-        if (inscricaoRepository.existsByClienteIdAndExcursaoId(clienteId, excursaoId)) {
-            throw new BusinessException("Cliente já está inscrito nesta excursão");
-        }
-
-        // Criar inscrição
-        Inscricao inscricao = new Inscricao();
-        inscricao.setExcursao(excursao);
-        inscricao.setCliente(cliente);
-        inscricao.setValorPago(excursao.getPreco());
-        inscricao.setObservacoesCliente(request.getObservacoesCliente());
-        inscricao.setStatusPagamento(StatusPagamento.PENDENTE);
-
-        inscricao = inscricaoRepository.save(inscricao);
-
-        // Atualizar vagas ocupadas
-        excursao.setVagasOcupadas(excursao.getVagasOcupadas() + 1);
-        if (excursao.getVagasOcupadas().equals(excursao.getVagasTotal())) {
-            excursao.setStatus(StatusExcursao.LOTADA);
-        }
-
-        // Enviar email de confirmação
-        emailService.enviarConfirmacaoInscricao(inscricao);
-
-        return converterParaResponse(inscricao);
-    }
-
     @Transactional(readOnly = true)
     public Page<InscricaoResponse> listarInscricoesPorCliente(UUID clienteId, Pageable pageable) {
         Page<Inscricao> inscricoes = inscricaoRepository.findByClienteId(clienteId, pageable);
@@ -167,15 +127,5 @@ public class InscricaoService {
         if (novoStatus == StatusPagamento.APROVADO) {
             emailService.enviarConfirmacaoPagamento(inscricao);
         }
-    }
-
-    private InscricaoResponse converterParaResponse(Inscricao inscricao) {
-        InscricaoResponse response = modelMapper.map(inscricao, InscricaoResponse.class);
-        response.setTituloExcursao(inscricao.getExcursao().getTitulo());
-        response.setDataSaidaExcursao(inscricao.getExcursao().getDataSaida());
-        response.setNomeCliente(inscricao.getCliente().getFullName());
-        response.setEmailCliente(inscricao.getCliente().getEmail());
-        response.setTelefoneCliente(inscricao.getCliente().getPhone());
-        return response;
     }
 }

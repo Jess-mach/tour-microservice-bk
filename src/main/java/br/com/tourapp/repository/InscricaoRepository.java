@@ -19,7 +19,6 @@ import java.util.UUID;
 @Repository
 public interface InscricaoRepository extends JpaRepository<Inscricao, UUID> {
 
-    // MÉTODOS AJUSTADOS PARA UserEntity ao invés de Cliente
     @Query("SELECT i FROM Inscricao i WHERE i.user.id = :userId")
     Page<Inscricao> findByClienteId(@Param("userId") UUID userId, Pageable pageable);
 
@@ -38,7 +37,6 @@ public interface InscricaoRepository extends JpaRepository<Inscricao, UUID> {
                                                      @Param("excursaoId") UUID excursaoId,
                                                      Pageable pageable);
 
-    // MÉTODO AJUSTADO
     @Query("SELECT CASE WHEN COUNT(i) > 0 THEN true ELSE false END " +
             "FROM Inscricao i WHERE i.user.id = :userId AND i.excursao.id = :excursaoId")
     boolean existsByClienteIdAndExcursaoId(@Param("userId") UUID userId, @Param("excursaoId") UUID excursaoId);
@@ -54,4 +52,19 @@ public interface InscricaoRepository extends JpaRepository<Inscricao, UUID> {
 
     @Query("SELECT i FROM Inscricao i WHERE i.statusPagamento = :status")
     List<Inscricao> findByStatusPagamento(@Param("status") StatusPagamento status);
+
+    @Query("SELECT SUM(i.valorPago) FROM Inscricao i " +
+            "WHERE i.excursao.compania.id = :companiaId " +
+            "AND i.statusPagamento = 'APROVADO' " +
+            "AND i.createdAt BETWEEN :inicio AND :fim")
+    BigDecimal findTotalReceitaByCompaniaAndPeriodo(@Param("companiaId") UUID companiaId,
+                                                    @Param("inicio") LocalDateTime inicio,
+                                                    @Param("fim") LocalDateTime fim);
+
+    @Query("SELECT COUNT(i) FROM Inscricao i " +
+            "WHERE i.excursao.compania.id = :companiaId " +
+            "AND i.createdAt BETWEEN :inicio AND :fim")
+    Long countInscricoesByCompaniaAndPeriodo(@Param("companiaId") UUID companiaId,
+                                             @Param("inicio") LocalDateTime inicio,
+                                             @Param("fim") LocalDateTime fim);
 }

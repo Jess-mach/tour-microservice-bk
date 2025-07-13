@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface NotificationUseCase {
-    NotificacaoResponse criarNotificacao(@Valid NotificacaoRequest request, UUID id);
+    NotificacaoResponse criarNotificacao(NotificacaoRequest request, UUID id);
 
     void enviarNotificacao(UUID id, UUID id1);
 

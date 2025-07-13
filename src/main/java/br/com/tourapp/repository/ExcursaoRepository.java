@@ -14,9 +14,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+
 @Repository
 public interface ExcursaoRepository extends JpaRepository<Excursao, UUID> {
 
+    // Métodos existentes mantidos
     Page<Excursao> findByOrganizadorId(UUID organizadorId, Pageable pageable);
 
     Page<Excursao> findByOrganizadorIdAndStatus(UUID organizadorId, StatusExcursao status, Pageable pageable);
@@ -45,6 +47,7 @@ public interface ExcursaoRepository extends JpaRepository<Excursao, UUID> {
     List<Excursao> findExcursoesProximasSaida(@Param("hoje") LocalDateTime hoje,
                                               @Param("amanha") LocalDateTime amanha);
 
+    // MÉTODOS AJUSTADOS PARA COMPANIAS
     @Query("SELECT e FROM Excursao e WHERE e.compania.id = :companiaId AND e.status = :status")
     Page<Excursao> findByCompaniaIdAndStatus(@Param("companiaId") UUID companiaId,
                                              @Param("status") StatusExcursao status,
@@ -52,4 +55,14 @@ public interface ExcursaoRepository extends JpaRepository<Excursao, UUID> {
 
     @Query("SELECT e FROM Excursao e WHERE e.compania.id = :companiaId")
     Page<Excursao> findByCompaniaId(@Param("companiaId") UUID companiaId, Pageable pageable);
+
+    @Query("SELECT COUNT(e) FROM Excursao e WHERE e.compania.id = :companiaId")
+    Long countByCompaniaId(@Param("companiaId") UUID companiaId);
+
+    @Query("SELECT COUNT(e) FROM Excursao e WHERE e.compania.id = :companiaId AND e.status = :status")
+    Long countByCompaniaIdAndStatus(@Param("companiaId") UUID companiaId, @Param("status") StatusExcursao status);
+
+    @Query("SELECT COUNT(i) FROM Inscricao i WHERE i.excursao.id = :excursaoId")
+    Long countByExcursaoId(@Param("excursaoId") UUID excursaoId);
 }
+

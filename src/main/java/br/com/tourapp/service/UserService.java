@@ -6,13 +6,19 @@ import br.com.tourapp.dto.GoogleUserInfo;
 import br.com.tourapp.dto.response.DashboardResponse;
 import br.com.tourapp.dto.response.JwtResponse;
 import br.com.tourapp.dto.response.UserInfoResponse;
+import br.com.tourapp.entity.CompaniaEntity;
 import br.com.tourapp.entity.RoleEntity;
 import br.com.tourapp.entity.UserEntity;
+import br.com.tourapp.exception.AccessDeniedException;
+import br.com.tourapp.exception.BusinessException;
+import br.com.tourapp.exception.NotFoundException;
+import br.com.tourapp.repository.CompaniaRepository;
 import br.com.tourapp.repository.RoleRepository;
 import br.com.tourapp.repository.UserRepository;
 import br.com.tourapp.dto.SecurityUser;
 import br.com.tourapp.util.JwtUtils;
 import com.nimbusds.openid.connect.sdk.UserInfoRequest;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,6 +27,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +36,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService implements UserUseCase {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -37,17 +45,7 @@ public class UserService implements UserUseCase {
     private final JwtUtils jwtUtils;
     private final GoogleTokenVerifier googleTokenVerifier;
 
-    public UserService(
-            UserRepository userRepository,
-            RoleRepository roleRepository,
-            JwtUtils jwtUtils,
-            GoogleTokenVerifier googleTokenVerifier
-    ) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.jwtUtils = jwtUtils;
-        this.googleTokenVerifier = googleTokenVerifier;
-    }
+    private final CompaniaRepository companiaRepository;
 
     /**
      * Método para processar Google ID Token e retornar usuário e SecurityUser
@@ -120,52 +118,221 @@ public class UserService implements UserUseCase {
 
     @Override
     public UserInfoResponse obterPerfil(UUID id) {
-        return null; //TODO resolver com a Claude
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+
+        List<String> roles = user.getRoles().stream()
+                .map(RoleEntity::getName)
+                .collect(Collectors.toList());
+
+        boolean hasActiveSubscription = user.getSubscriptionExpiry() != null &&
+                user.getSubscriptionExpiry().isAfter(LocalDateTime.now());
+
+        return UserInfoResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .profilePicture(user.getProfilePicture())
+                .createdAt(user.getCreatedAt())
+                .lastLogin(user.getLastLogin())
+                .roles(roles)
+                .subscriptionPlan(user.getSubscriptionPlan())
+                .subscriptionExpiry(user.getSubscriptionExpiry())
+                .hasActiveSubscription(hasActiveSubscription)
+                .build();
     }
 
     @Override
     public UserInfoResponse atualizarPerfil(UUID id, UserInfoRequest request) {
-        return null; //TODO resolver com a Claude
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+
+        // Atualizar campos permitidos
+        if (request.getNome() != null) {
+            user.setFullName(request.getNome());
+        }
+        if (request.getTelefone() != null) {
+            user.setPhone(request.getTelefone());
+        }
+        if (request.getCep() != null) {
+            user.setCep(request.getCep());
+        }
+        if (request.getEndereco() != null) {
+            user.setEndereco(request.getEndereco());
+        }
+        if (request.getCidade() != null) {
+            user.setCidade(request.getCidade());
+        }
+        if (request.getEstado() != null) {
+            user.setEstado(request.getEstado());
+        }
+
+        user = userRepository.save(user);
+        return obterPerfil(user.getId());
     }
 
     @Override
-    public DashboardResponse obterDashboard(UUID id, UUID companiaId, LocalDate dataInicio, LocalDate dataFim) {
-        return null;//TODO resolver com a Claude
+    public DashboardResponse obterDashboard(UUID userId, UUID companiaId, LocalDate dataInicio, LocalDate dataFim) {
+        // Validar se usuário tem acesso à compania
+        if (!userCompaniaRepository.existsByUserIdAndCompaniaIdAndAtivoTrue(userId, companiaId)) {
+            throw new AccessDeniedException("Usuário não tem acesso a esta compania");
+        }
+
+        if (dataInicio == null) {
+            dataInicio = LocalDate.now().withDayOfMonth(1);
+        }
+        if (dataFim == null) {
+            dataFim = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
+        }
+
+        LocalDateTime inicio = dataInicio.atStartOfDay();
+        LocalDateTime fim = dataFim.atTime(23, 59, 59);
+
+        DashboardResponse dashboard = new DashboardResponse();
+        dashboard.setPeriodoInicio(dataInicio);
+        dashboard.setPeriodoFim(dataFim);
+
+        // Buscar estatísticas da compania
+        Long totalExcursoes = excursaoRepository.countByCompaniaId(companiaId);
+        Long excursoesAtivas = excursaoRepository.countByCompaniaIdAndStatus(companiaId, StatusExcursao.ATIVA);
+
+        dashboard.setTotalExcursoes(totalExcursoes);
+        dashboard.setExcursoesAtivas(excursoesAtivas);
+
+        // Buscar receita do período
+        BigDecimal receitaTotal = inscricaoRepository.findTotalReceitaByCompaniaAndPeriodo(
+                companiaId, inicio, fim);
+        dashboard.setReceitaTotal(receitaTotal != null ? receitaTotal : BigDecimal.ZERO);
+
+        // Outras estatísticas
+        Long totalInscricoes = inscricaoRepository.countInscricoesByCompaniaAndPeriodo(
+                companiaId, inicio, fim);
+        dashboard.setTotalInscricoes(totalInscricoes != null ? totalInscricoes : 0L);
+
+        return dashboard;
     }
 
     @Override
-    public DashboardResponse obterDashboardConsolidado(UUID id, LocalDate dataInicio, LocalDate dataFim) {
-        return null;//TODO resolver com a Claude
+    public DashboardResponse obterDashboardConsolidado(UUID userId, LocalDate dataInicio, LocalDate dataFim) {
+        // Buscar todas as companias do usuário
+        List<CompaniaEntity> companias = companiaRepository.findByUserId(userId);
+
+        if (companias.isEmpty()) {
+            throw new BusinessException("Usuário não possui nenhuma compania");
+        }
+
+        if (dataInicio == null) {
+            dataInicio = LocalDate.now().withDayOfMonth(1);
+        }
+        if (dataFim == null) {
+            dataFim = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
+        }
+
+        DashboardResponse dashboardConsolidado = new DashboardResponse();
+        dashboardConsolidado.setPeriodoInicio(dataInicio);
+        dashboardConsolidado.setPeriodoFim(dataFim);
+
+        // Consolidar dados de todas as companias
+        Long totalExcursoes = 0L;
+        Long excursoesAtivas = 0L;
+        BigDecimal receitaTotal = BigDecimal.ZERO;
+
+        for (CompaniaEntity compania : companias) {
+            DashboardResponse dashCompania = obterDashboard(userId, compania.getId(), dataInicio, dataFim);
+            totalExcursoes += dashCompania.getTotalExcursoes();
+            excursoesAtivas += dashCompania.getExcursoesAtivas();
+            receitaTotal = receitaTotal.add(dashCompania.getReceitaTotal());
+        }
+
+        dashboardConsolidado.setTotalExcursoes(totalExcursoes);
+        dashboardConsolidado.setExcursoesAtivas(excursoesAtivas);
+        dashboardConsolidado.setReceitaTotal(receitaTotal);
+
+        return dashboardConsolidado;
     }
 
     @Override
-    public UserEntity obterPorId(UUID clienteId) {
-        return null;//TODO resolver com a Claude
+    public UserEntity obterPorId(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
     }
 
     @Override
-    public void atualizarPushToken(UUID id, String pushToken) {
-//TODO resolver com a Claude
+    public void atualizarPushToken(UUID userId, String pushToken) {
+        UserEntity user = obterPorId(userId);
+        user.setPushToken(pushToken);
+        userRepository.save(user);
     }
 
     @Override
-    public void atualizarConfiguracoes(UUID id, Boolean emailNotifications, Boolean smsNotifications) {
-//TODO resolver com a Claude
+    public void atualizarConfiguracoes(UUID userId, Boolean emailNotifications, Boolean smsNotifications) {
+        UserEntity user = obterPorId(userId);
+
+        if (emailNotifications != null) {
+            user.setEmailNotifications(emailNotifications);
+        }
+        if (smsNotifications != null) {
+            user.setSmsNotifications(smsNotifications);
+        }
+
+        userRepository.save(user);
     }
 
     @Override
-    public OrganizadorController.ReceitaEstatisticasResponse obterEstatisticasReceita(UUID id, UUID companiaId, LocalDate dataInicio, LocalDate dataFim) {
-        return null;//TODO resolver com a Claude
+    public OrganizadorController.ReceitaEstatisticasResponse obterEstatisticasReceita(
+            UUID userId, UUID companiaId, LocalDate dataInicio, LocalDate dataFim) {
+
+        if (companiaId != null) {
+            // Validar acesso à compania
+            if (!userCompaniaRepository.existsByUserIdAndCompaniaIdAndAtivoTrue(userId, companiaId)) {
+                throw new AccessDeniedException("Usuário não tem acesso a esta compania");
+            }
+        }
+
+        OrganizadorController.ReceitaEstatisticasResponse response =
+                new OrganizadorController.ReceitaEstatisticasResponse();
+
+        // Implementar lógica de estatísticas de receita
+        // Por enquanto, retornando resposta vazia
+        return response;
     }
 
     @Override
-    public OrganizadorController.ExcursoesEstatisticasResponse obterEstatisticasExcursoes(UUID id, UUID companiaId, LocalDate dataInicio, LocalDate dataFim) {
-        return null;//TODO resolver com a Claude
+    public OrganizadorController.ExcursoesEstatisticasResponse obterEstatisticasExcursoes(
+            UUID userId, UUID companiaId, LocalDate dataInicio, LocalDate dataFim) {
+
+        if (companiaId != null) {
+            // Validar acesso à compania
+            if (!userCompaniaRepository.existsByUserIdAndCompaniaIdAndAtivoTrue(userId, companiaId)) {
+                throw new AccessDeniedException("Usuário não tem acesso a esta compania");
+            }
+        }
+
+        OrganizadorController.ExcursoesEstatisticasResponse response =
+                new OrganizadorController.ExcursoesEstatisticasResponse();
+
+        // Implementar lógica de estatísticas de excursões
+        // Por enquanto, retornando resposta vazia
+        return response;
     }
 
     @Override
-    public OrganizadorController.RelatorioVendasResponse gerarRelatorioVendas(UUID id, UUID companiaId, LocalDate dataInicio, LocalDate dataFim, Boolean incluirDetalhado) {
-        return null;//TODO resolver com a Claude
+    public OrganizadorController.RelatorioVendasResponse gerarRelatorioVendas(
+            UUID userId, UUID companiaId, LocalDate dataInicio, LocalDate dataFim, Boolean incluirDetalhado) {
+
+        if (companiaId != null) {
+            // Validar acesso à compania
+            if (!userCompaniaRepository.existsByUserIdAndCompaniaIdAndAtivoTrue(userId, companiaId)) {
+                throw new AccessDeniedException("Usuário não tem acesso a esta compania");
+            }
+        }
+
+        OrganizadorController.RelatorioVendasResponse response =
+                new OrganizadorController.RelatorioVendasResponse();
+
+        // Implementar lógica do relatório de vendas
+        // Por enquanto, retornando resposta vazia
+        return response;
     }
 
     /**

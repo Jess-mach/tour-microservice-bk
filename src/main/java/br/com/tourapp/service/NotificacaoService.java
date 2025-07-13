@@ -4,6 +4,7 @@ package br.com.tourapp.service;
 import br.com.tourapp.dto.request.NotificacaoRequest;
 import br.com.tourapp.dto.response.NotificacaoResponse;
 import br.com.tourapp.dto.response.UserInfoResponse;
+import br.com.tourapp.entity.CompaniaEntity;
 import br.com.tourapp.entity.Excursao;
 import br.com.tourapp.entity.Notificacao;
 import br.com.tourapp.entity.UserEntity;
@@ -123,61 +124,6 @@ public class NotificacaoService implements NotificationUseCase {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public NotificacaoResponse criarNotificacao(NotificacaoRequest request, UUID organizadorId) {
-        logger.info("Criando notificação para organizador: {}", organizadorId);
-
-        //TODO resolver com a Claude
-        UserEntity organizador = clienteRepository.findById(organizadorId)
-                .orElseThrow(() -> new NotFoundException("Organizador não encontrado"));
-
-        // Validações de negócio
-        validarNotificacao(request, organizadorId);
-
-        Notificacao notificacao = new Notificacao();
-        notificacao.setOrganizador(organizador);
-        notificacao.setTitulo(request.getTitulo());
-        notificacao.setMensagem(request.getMensagem());
-        notificacao.setTipo(request.getTipo() != null ? request.getTipo() : TipoNotificacao.INFO);
-        notificacao.setEnviarParaTodos(request.getEnviarParaTodos());
-
-        // Se especificou excursão, vincular e validar
-        if (request.getExcursaoId() != null) {
-            Excursao excursao = modelMapper.map(
-                    excursaoService.obterExcursaoPorOrganizador(request.getExcursaoId(), organizadorId), Excursao.class);
-
-            notificacao.setExcursao(excursao);
-
-            // Se é para excursão específica mas marcou "enviar para todos", ajustar
-            if (request.getEnviarParaTodos()) {
-                notificacao.setEnviarParaTodos(false); // Enviar apenas para clientes da excursão
-                logger.info("Ajustando notificação para enviar apenas para clientes da excursão: {}",
-                        excursao.getTitulo());
-            }
-        }
-
-        // Definir clientes alvo
-        if (!notificacao.getEnviarParaTodos() && request.getClientesAlvo() != null && !request.getClientesAlvo().isEmpty()) {
-            // Validar se todos os clientes existem
-            List<UserEntity> clientesValidos = clienteRepository.findAllById(request.getClientesAlvo());
-            if (clientesValidos.size() != request.getClientesAlvo().size()) {
-                throw new BusinessException("Alguns clientes especificados não foram encontrados");
-            }
-            notificacao.setClientesAlvo(request.getClientesAlvo());
-        }
-
-        notificacao = notificacaoRepository.save(notificacao);
-
-        logger.info("Notificação criada com ID: {}", notificacao.getId());
-
-        NotificacaoResponse response = converterParaResponse(notificacao);
-
-        // Calcular total de destinatários
-        response.setTotalDestinatarios(calcularTotalDestinatarios(notificacao));
-
-        return response;
-    }
-
     @Async
     public void enviarNotificacao(UUID notificacaoId, UUID organizadorId) {
         logger.info("Iniciando envio de notificação: {} do organizador: {}", notificacaoId, organizadorId);
@@ -254,20 +200,6 @@ public class NotificacaoService implements NotificationUseCase {
             response.setTotalDestinatarios(calcularTotalDestinatarios(notificacao));
             return response;
         });
-    }
-
-    @Transactional(readOnly = true)
-    public List<UserInfoResponse> listarClientesPorExcursao(UUID excursaoId, UUID organizadorId) {
-        logger.info("Listando clientes da excursão: {} do organizador: {}", excursaoId, organizadorId);
-
-        // Verificar se a excursão pertence ao organizador
-        excursaoService.obterExcursaoPorOrganizador(excursaoId, organizadorId);
-
-        //TODO resolver com a Claude
-        return clienteRepository.findByExcursaoId(excursaoId)
-                .stream()
-                .map(cliente -> modelMapper.map(cliente, UserInfoResponse.class))
-                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)

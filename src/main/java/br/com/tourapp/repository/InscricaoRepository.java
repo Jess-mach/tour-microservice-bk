@@ -67,4 +67,7 @@ public interface InscricaoRepository extends JpaRepository<Inscricao, UUID> {
     Long countInscricoesByCompaniaAndPeriodo(@Param("companiaId") UUID companiaId,
                                              @Param("inicio") LocalDateTime inicio,
                                              @Param("fim") LocalDateTime fim);
+
+    @Query("SELECT COUNT(i) FROM Inscricao i WHERE i.excursao.id = :excursaoId")
+    Long countByExcursaoId(UUID excursaoId);
 }

@@ -1,11 +1,12 @@
 package br.com.tourapp.controller;
 
+import br.com.tourapp.dto.request.UpdateUserRequest;
 import br.com.tourapp.dto.response.InscricaoResponse;
 import br.com.tourapp.dto.response.UserInfoResponse;
 import br.com.tourapp.service.InscricaoService;
 import br.com.tourapp.dto.SecurityUser;
 import br.com.tourapp.service.UserUseCase;
-import com.nimbusds.openid.connect.sdk.UserInfoRequest;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,7 @@ public class ClienteController {
 
     @PutMapping("/perfil")
     public ResponseEntity<UserInfoResponse> atualizarPerfil(
-            @RequestBody UserInfoRequest request,
+            @RequestBody UpdateUserRequest request,
             @AuthenticationPrincipal SecurityUser user) {
         UserInfoResponse response = clienteService.atualizarPerfil(user.getId(), request);
         return ResponseEntity.ok(response);

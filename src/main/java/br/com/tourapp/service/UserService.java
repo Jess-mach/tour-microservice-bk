@@ -3,21 +3,21 @@ package br.com.tourapp.service;
 import br.com.tourapp.config.security.GoogleTokenVerifier;
 import br.com.tourapp.controller.OrganizadorController;
 import br.com.tourapp.dto.GoogleUserInfo;
+import br.com.tourapp.dto.request.UpdateUserRequest;
 import br.com.tourapp.dto.response.DashboardResponse;
 import br.com.tourapp.dto.response.JwtResponse;
 import br.com.tourapp.dto.response.UserInfoResponse;
 import br.com.tourapp.entity.CompaniaEntity;
 import br.com.tourapp.entity.RoleEntity;
 import br.com.tourapp.entity.UserEntity;
+import br.com.tourapp.enums.StatusExcursao;
 import br.com.tourapp.exception.AccessDeniedException;
 import br.com.tourapp.exception.BusinessException;
 import br.com.tourapp.exception.NotFoundException;
-import br.com.tourapp.repository.CompaniaRepository;
-import br.com.tourapp.repository.RoleRepository;
-import br.com.tourapp.repository.UserRepository;
+import br.com.tourapp.repository.*;
 import br.com.tourapp.dto.SecurityUser;
 import br.com.tourapp.util.JwtUtils;
-import com.nimbusds.openid.connect.sdk.UserInfoRequest;
+
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,8 +44,10 @@ public class UserService implements UserUseCase {
     private final RoleRepository roleRepository;
     private final JwtUtils jwtUtils;
     private final GoogleTokenVerifier googleTokenVerifier;
-
     private final CompaniaRepository companiaRepository;
+    private final UserCompaniaRepository userCompaniaRepository;
+    private final ExcursaoRepository excursaoRepository;
+    private final InscricaoRepository inscricaoRepository;
 
     /**
      * Método para processar Google ID Token e retornar usuário e SecurityUser
@@ -143,28 +145,28 @@ public class UserService implements UserUseCase {
     }
 
     @Override
-    public UserInfoResponse atualizarPerfil(UUID id, UserInfoRequest request) {
+    public UserInfoResponse atualizarPerfil(UUID id, UpdateUserRequest request) {
         UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
 
         // Atualizar campos permitidos
-        if (request.getNome() != null) {
-            user.setFullName(request.getNome());
+        if (request.nome() != null) {
+            user.setFullName(request.nome());
         }
-        if (request.getTelefone() != null) {
-            user.setPhone(request.getTelefone());
+        if (request.telefone() != null) {
+            user.setPhone(request.telefone());
         }
-        if (request.getCep() != null) {
-            user.setCep(request.getCep());
+        if (request.cep() != null) {
+            user.setCep(request.cep());
         }
-        if (request.getEndereco() != null) {
-            user.setEndereco(request.getEndereco());
+        if (request.endereco() != null) {
+            user.setEndereco(request.endereco());
         }
-        if (request.getCidade() != null) {
-            user.setCidade(request.getCidade());
+        if (request.cidade() != null) {
+            user.setCidade(request.cidade());
         }
-        if (request.getEstado() != null) {
-            user.setEstado(request.getEstado());
+        if (request.estado() != null) {
+            user.setEstado(request.estado());
         }
 
         user = userRepository.save(user);

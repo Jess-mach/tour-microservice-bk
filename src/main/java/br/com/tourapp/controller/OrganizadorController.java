@@ -1,5 +1,6 @@
 package br.com.tourapp.controller;
 
+import br.com.tourapp.dto.request.UpdateUserRequest;
 import br.com.tourapp.dto.response.DashboardResponse;
 import br.com.tourapp.dto.response.InscricaoResponse;
 
@@ -8,7 +9,7 @@ import br.com.tourapp.service.InscricaoService;
 import br.com.tourapp.service.CompaniaSecurityService;
 import br.com.tourapp.dto.SecurityUser;
 import br.com.tourapp.service.UserUseCase;
-import com.nimbusds.openid.connect.sdk.UserInfoRequest;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
@@ -54,7 +55,7 @@ public class OrganizadorController {
     @PutMapping("/perfil")
     @Operation(summary = "Atualizar perfil", description = "Atualiza dados do perfil do organizador")
     public ResponseEntity<UserInfoResponse> atualizarPerfil(
-            @RequestBody UserInfoRequest request,
+            @RequestBody UpdateUserRequest request,
             @AuthenticationPrincipal SecurityUser user) {
         UserInfoResponse response = organizadorService.atualizarPerfil(user.getId(), request);
         return ResponseEntity.ok(response);

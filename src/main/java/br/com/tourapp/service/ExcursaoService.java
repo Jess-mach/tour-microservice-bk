@@ -12,7 +12,9 @@ import br.com.tourapp.exception.BusinessException;
 import br.com.tourapp.exception.NotFoundException;
 import br.com.tourapp.repository.ExcursaoRepository;
 import br.com.tourapp.repository.CompaniaRepository;
+import br.com.tourapp.repository.InscricaoRepository;
 import br.com.tourapp.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,12 +23,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ExcursaoService implements ExcursaoUseCase {
 
     private final ExcursaoRepository excursaoRepository;
@@ -34,18 +40,7 @@ public class ExcursaoService implements ExcursaoUseCase {
     private final UserRepository userRepository;
     private final S3Service s3Service;
     private final ModelMapper modelMapper;
-
-    public ExcursaoService(ExcursaoRepository excursaoRepository,
-                           CompaniaRepository companiaRepository,
-                           UserRepository userRepository,
-                           S3Service s3Service,
-                           ModelMapper modelMapper) {
-        this.excursaoRepository = excursaoRepository;
-        this.companiaRepository = companiaRepository;
-        this.userRepository = userRepository;
-        this.s3Service = s3Service;
-        this.modelMapper = modelMapper;
-    }
+    private final InscricaoRepository inscricaoRepository;
 
     @CacheEvict(value = "excursoes", allEntries = true)
     public ExcursaoResponse criarExcursao(ExcursaoRequest request, UUID companiaId, UUID criadorId) {

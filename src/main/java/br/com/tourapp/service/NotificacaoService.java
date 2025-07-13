@@ -258,17 +258,17 @@ public class NotificacaoService implements NotificationUseCase {
         if (notificacao.getEnviarParaTodos()) {
             if (notificacao.getExcursao() != null) {
                 // Todos os clientes inscritos na excursão específica
-                destinatarios = clienteRepository.findByExcursaoId(notificacao.getExcursao().getId());
+                destinatarios = userRepository.findByExcursaoId(notificacao.getExcursao().getId());
             } else {
                 // Todos os clientes ativos da plataforma
-                destinatarios = clienteRepository.findByAtivoTrue();
+                destinatarios = userRepository.findByAtivoTrue();
             }
         } else if (notificacao.getExcursao() != null) {
             // Clientes da excursão específica
-            destinatarios = clienteRepository.findByExcursaoId(notificacao.getExcursao().getId());
+            destinatarios = userRepository.findByExcursaoId(notificacao.getExcursao().getId());
         } else if (notificacao.getClientesAlvo() != null && !notificacao.getClientesAlvo().isEmpty()) {
             // Clientes específicos
-            destinatarios = clienteRepository.findAllById(notificacao.getClientesAlvo());
+            destinatarios = userRepository.findAllById(notificacao.getClientesAlvo());
         }
 
         // Filtrar apenas clientes ativos
@@ -328,43 +328,43 @@ public class NotificacaoService implements NotificationUseCase {
         return response;
     }
 
-    // Métodos para uso interno e agendamento
-
-    @Async
-    public void enviarLembreteExcursao(UUID excursaoId) {
-        logger.info("Enviando lembrete automático para excursão: {}", excursaoId);
-
-        try {
-            // Buscar a excursão e seus inscritos
-            List<UserEntity> inscritos = clienteRepository.findByExcursaoId(excursaoId);
-
-            if (inscritos.isEmpty()) {
-                logger.info("Nenhum inscrito encontrado para a excursão: {}", excursaoId);
-                return;
-            }
-
-            // Criar mensagem de lembrete
-            String titulo = "Lembrete: Sua excursão é amanhã!";
-            String mensagem = "Não esqueça de sua excursão que acontece amanhã. Prepare-se e chegue no horário!";
-
-            // Enviar emails
-            List<String> emails = filtrarEmailsValidos(inscritos);
-            if (!emails.isEmpty()) {
-                // Aqui você criaria uma notificação temporária ou enviaria diretamente
-                logger.info("Enviando lembretes por email para {} clientes", emails.size());
-            }
-
-            // Enviar push notifications
-            List<String> pushTokens = filtrarPushTokensValidos(inscritos);
-            if (!pushTokens.isEmpty()) {
-                firebaseService.enviarNotificacaoMultipla(pushTokens, titulo, mensagem);
-                logger.info("Enviando lembretes push para {} dispositivos", pushTokens.size());
-            }
-
-        } catch (Exception e) {
-            logger.error("Erro ao enviar lembrete para excursão {}: {}", excursaoId, e.getMessage(), e);
-        }
-    }
+//    // Métodos para uso interno e agendamento
+//
+//    @Async
+//    public void enviarLembreteExcursao(UUID excursaoId) {
+//        logger.info("Enviando lembrete automático para excursão: {}", excursaoId);
+//
+//        try {
+//            // Buscar a excursão e seus inscritos
+//            List<UserEntity> inscritos = clienteRepository.findByExcursaoId(excursaoId);
+//
+//            if (inscritos.isEmpty()) {
+//                logger.info("Nenhum inscrito encontrado para a excursão: {}", excursaoId);
+//                return;
+//            }
+//
+//            // Criar mensagem de lembrete
+//            String titulo = "Lembrete: Sua excursão é amanhã!";
+//            String mensagem = "Não esqueça de sua excursão que acontece amanhã. Prepare-se e chegue no horário!";
+//
+//            // Enviar emails
+//            List<String> emails = filtrarEmailsValidos(inscritos);
+//            if (!emails.isEmpty()) {
+//                // Aqui você criaria uma notificação temporária ou enviaria diretamente
+//                logger.info("Enviando lembretes por email para {} clientes", emails.size());
+//            }
+//
+//            // Enviar push notifications
+//            List<String> pushTokens = filtrarPushTokensValidos(inscritos);
+//            if (!pushTokens.isEmpty()) {
+//                firebaseService.enviarNotificacaoMultipla(pushTokens, titulo, mensagem);
+//                logger.info("Enviando lembretes push para {} dispositivos", pushTokens.size());
+//            }
+//
+//        } catch (Exception e) {
+//            logger.error("Erro ao enviar lembrete para excursão {}: {}", excursaoId, e.getMessage(), e);
+//        }
+//    }
 
     @Async
     public void enviarConfirmacaoInscricao(UUID inscricaoId, String nomeCliente, String tituloExcursao) {

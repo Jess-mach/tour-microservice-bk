@@ -1,6 +1,7 @@
 package br.com.tourapp.service;
 
 import br.com.tourapp.controller.OrganizadorController;
+import br.com.tourapp.dto.request.UpdateUserRequest;
 import br.com.tourapp.dto.response.DashboardResponse;
 import br.com.tourapp.dto.response.JwtResponse;
 import br.com.tourapp.dto.response.UserInfoResponse;
@@ -28,7 +29,7 @@ public interface UserUseCase {
 
     UserInfoResponse obterPerfil(UUID id);
 
-    UserInfoResponse atualizarPerfil(UUID id, UserInfoRequest request);
+    UserInfoResponse atualizarPerfil(UUID id, UpdateUserRequest request);
 
     DashboardResponse obterDashboard(UUID id, UUID companiaId, LocalDate dataInicio, LocalDate dataFim);
 

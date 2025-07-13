@@ -13,13 +13,14 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
 @Repository
 public interface NotificacaoRepository extends JpaRepository<Notificacao, UUID> {
 
-    Page<Notificacao> findByOrganizadorId(UUID organizadorId, Pageable pageable);
+    @Query("SELECT n FROM Notificacao n WHERE n.organizador.id = :organizadorId")
+    Page<Notificacao> findByOrganizadorId(@Param("organizadorId") UUID organizadorId, Pageable pageable);
 
-//    List<Notificacao> findByOrganizadorIdAndEnviadaFalse(UUID organizadorId);
+    @Query("SELECT n FROM Notificacao n WHERE n.organizador.id = :organizadorId AND n.enviada = false")
+    List<Notificacao> findByOrganizadorIdAndEnviadaFalse(@Param("organizadorId") UUID organizadorId);
 
     @Query("SELECT n FROM Notificacao n WHERE n.organizador.id = :organizadorId AND n.id = :notificacaoId")
     Notificacao findByIdAndOrganizadorId(@Param("notificacaoId") UUID notificacaoId,

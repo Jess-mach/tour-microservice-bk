@@ -53,4 +53,12 @@ public class CompaniaResponse {
     private String observacoes;
     private Boolean isConvitePendente;
 
+    // Métodos auxiliares para verificações
+    public boolean isPerfilCompleto() {
+        return nomeEmpresa != null && !nomeEmpresa.trim().isEmpty() &&
+                cnpj != null && !cnpj.trim().isEmpty() &&
+                endereco != null && !endereco.trim().isEmpty() &&
+                cidade != null && !cidade.trim().isEmpty() &&
+                estado != null && !estado.trim().isEmpty();
+    }
 }

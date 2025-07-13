@@ -10,8 +10,10 @@ import br.com.tourapp.entity.UserEntity;
 import br.com.tourapp.enums.TipoNotificacao;
 import br.com.tourapp.exception.BusinessException;
 import br.com.tourapp.exception.NotFoundException;
+import br.com.tourapp.repository.CompaniaRepository;
 import br.com.tourapp.repository.NotificacaoRepository;
 import br.com.tourapp.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,29 +31,96 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class NotificacaoService implements NotificationUseCase {
 
     private static final Logger logger = LoggerFactory.getLogger(NotificacaoService.class);
 
     private final NotificacaoRepository notificacaoRepository;
     private final ExcursaoService excursaoService;
-    private final UserRepository clienteRepository;
+    private final UserRepository userRepository; // AJUSTADO
     private final EmailService emailService;
     private final FirebaseService firebaseService;
     private final ModelMapper modelMapper;
+    private final CompaniaRepository companiaRepository; // ADICIONADO
 
-    public NotificacaoService(NotificacaoRepository notificacaoRepository,
-                              ExcursaoService excursaoService,
-                              UserRepository clienteRepository,
-                              EmailService emailService,
-                              FirebaseService firebaseService,
-                              ModelMapper modelMapper) {
-        this.notificacaoRepository = notificacaoRepository;
-        this.excursaoService = excursaoService;
-        this.clienteRepository = clienteRepository;
-        this.emailService = emailService;
-        this.firebaseService = firebaseService;
-        this.modelMapper = modelMapper;
+    @Override
+    public NotificacaoResponse criarNotificacao(NotificacaoRequest request, UUID organizadorId) {
+        logger.info("Criando notificação para organizador: {}", organizadorId);
+
+        // AJUSTADO - buscar usuário e primeira compania
+        UserEntity organizador = userRepository.findById(organizadorId)
+                .orElseThrow(() -> new NotFoundException("Organizador não encontrado"));
+
+        List<CompaniaEntity> companias = companiaRepository.findByUserId(organizadorId);
+        if (companias.isEmpty()) {
+            throw new BusinessException("Usuário não possui nenhuma compania");
+        }
+        CompaniaEntity compania = companias.get(0); // Usar primeira compania
+
+        // Validações de negócio
+        validarNotificacao(request, organizadorId);
+
+        Notificacao notificacao = new Notificacao();
+        notificacao.setCompania(compania); // AJUSTADO
+        notificacao.setOrganizador(organizador);
+        notificacao.setTitulo(request.getTitulo());
+        notificacao.setMensagem(request.getMensagem());
+        notificacao.setTipo(request.getTipo() != null ? request.getTipo() : TipoNotificacao.INFO);
+        notificacao.setEnviarParaTodos(request.getEnviarParaTodos());
+
+        // Se especificou excursão, vincular e validar
+        if (request.getExcursaoId() != null) {
+            Excursao excursao = modelMapper.map(
+                    excursaoService.obterExcursaoPorOrganizador(request.getExcursaoId(), organizadorId), Excursao.class);
+
+            notificacao.setExcursao(excursao);
+
+            if (request.getEnviarParaTodos()) {
+                notificacao.setEnviarParaTodos(false);
+                logger.info("Ajustando notificação para enviar apenas para clientes da excursão: {}",
+                        excursao.getTitulo());
+            }
+        }
+
+        // Definir clientes alvo
+        if (!notificacao.getEnviarParaTodos() && request.getClientesAlvo() != null && !request.getClientesAlvo().isEmpty()) {
+            List<UserEntity> clientesValidos = userRepository.findAllById(request.getClientesAlvo());
+            if (clientesValidos.size() != request.getClientesAlvo().size()) {
+                throw new BusinessException("Alguns clientes especificados não foram encontrados");
+            }
+            notificacao.setClientesAlvo(request.getClientesAlvo());
+        }
+
+        notificacao = notificacaoRepository.save(notificacao);
+
+        logger.info("Notificação criada com ID: {}", notificacao.getId());
+
+        NotificacaoResponse response = converterParaResponse(notificacao);
+        response.setTotalDestinatarios(calcularTotalDestinatarios(notificacao));
+
+        return response;
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserInfoResponse> listarClientesPorExcursao(UUID excursaoId, UUID organizadorId) {
+        logger.info("Listando clientes da excursão: {} do organizador: {}", excursaoId, organizadorId);
+
+        // Verificar se a excursão pertence ao organizador
+        excursaoService.obterExcursaoPorOrganizador(excursaoId, organizadorId);
+
+        // AJUSTADO - buscar usuários inscritos na excursão
+        return userRepository.findByExcursaoId(excursaoId)
+                .stream()
+                .map(cliente -> UserInfoResponse.builder()
+                        .id(cliente.getId())
+                        .email(cliente.getEmail())
+                        .fullName(cliente.getFullName())
+                        .profilePicture(cliente.getProfilePicture())
+                        .createdAt(cliente.getCreatedAt())
+                        .lastLogin(cliente.getLastLogin())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override

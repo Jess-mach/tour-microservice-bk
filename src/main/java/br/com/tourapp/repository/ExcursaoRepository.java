@@ -45,9 +45,11 @@ public interface ExcursaoRepository extends JpaRepository<Excursao, UUID> {
     List<Excursao> findExcursoesProximasSaida(@Param("hoje") LocalDateTime hoje,
                                               @Param("amanha") LocalDateTime amanha);
 
-    //TODO resolver com a Claude
-    Page<Excursao> findByCompaniaIdAndStatus(UUID companiaId, StatusExcursao status, Pageable pageable);
+    @Query("SELECT e FROM Excursao e WHERE e.compania.id = :companiaId AND e.status = :status")
+    Page<Excursao> findByCompaniaIdAndStatus(@Param("companiaId") UUID companiaId,
+                                             @Param("status") StatusExcursao status,
+                                             Pageable pageable);
 
-    //TODO resolver com a Claude
-    Page<Excursao> findByCompaniaId(UUID companiaId, Pageable pageable);
+    @Query("SELECT e FROM Excursao e WHERE e.compania.id = :companiaId")
+    Page<Excursao> findByCompaniaId(@Param("companiaId") UUID companiaId, Pageable pageable);
 }

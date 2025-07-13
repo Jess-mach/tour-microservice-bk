@@ -20,6 +20,7 @@ import br.com.tourapp.repository.UserCompaniaRepository;
 import br.com.tourapp.repository.UserRepository;
 import br.com.tourapp.repository.ExcursaoRepository;
 import br.com.tourapp.repository.InscricaoRepository;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CompaniaService {
 
     private static final Logger logger = LoggerFactory.getLogger(CompaniaService.class);
@@ -48,22 +50,6 @@ public class CompaniaService {
     private final InscricaoRepository inscricaoRepository;
     private final CompaniaSecurityService securityService;
     private final ModelMapper modelMapper;
-
-    public CompaniaService(CompaniaRepository companiaRepository,
-                           UserCompaniaRepository userCompaniaRepository,
-                           UserRepository userRepository,
-                           ExcursaoRepository excursaoRepository,
-                           InscricaoRepository inscricaoRepository,
-                           CompaniaSecurityService securityService,
-                           ModelMapper modelMapper) {
-        this.companiaRepository = companiaRepository;
-        this.userCompaniaRepository = userCompaniaRepository;
-        this.userRepository = userRepository;
-        this.excursaoRepository = excursaoRepository;
-        this.inscricaoRepository = inscricaoRepository;
-        this.securityService = securityService;
-        this.modelMapper = modelMapper;
-    }
 
     // ============================================
     // CRUD BÁSICO DE COMPANIAS
@@ -366,21 +352,14 @@ public class CompaniaService {
     private CompaniaResponse converterParaResponse(CompaniaEntity compania, UUID userId) {
         CompaniaResponse response = modelMapper.map(compania, CompaniaResponse.class);
 
-        // Adicionar dados estatísticos TODO resolver com a Claude
-//        response.setTotalUsuarios(userCompaniaRepository.countActiveUsersByCompania(compania.getId()));
-//        response.setTotalExcursoes(companiaRepository.countExcursoesAtivas(compania.getId()));
-//        response.setPerfilCompleto(compania.isPerfilCompleto());
-
         // Adicionar dados do usuário na compania
         userCompaniaRepository.findByUserAndCompania(userId, compania.getId())
                 .ifPresent(uc -> {
-//                    response.setRoleUsuario(uc.getRoleCompania().name()); TODO resolver com a Claude
                     response.setPodeCreiarExcursoes(uc.getPodeCreiarExcursoes());
                     response.setPodeGerenciarUsuarios(uc.getPodeGerenciarUsuarios());
                     response.setPodeVerFinanceiro(uc.getPodeVerFinanceiro());
                     response.setPodeEditarCompania(uc.getPodeEditarCompania());
                     response.setPodeEnviarNotificacoes(uc.getPodeEnviarNotificacoes());
-//                    response.setDataIngresso(uc.getDataIngresso()); TODO resolver com a Claude
                 });
 
         return response;
@@ -430,4 +409,6 @@ public class CompaniaService {
 
         return response;
     }
+
+
 }

@@ -13,7 +13,6 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.util.List;
-
 @Service
 public class EmailService {
 
@@ -33,7 +32,7 @@ public class EmailService {
     public void enviarConfirmacaoInscricao(Inscricao inscricao) {
         try {
             Context context = new Context();
-            context.setVariable("nomeCliente", inscricao.getCliente().getNome());
+            context.setVariable("nomeCliente", inscricao.getUser().getFullName()); // AJUSTADO
             context.setVariable("tituloExcursao", inscricao.getExcursao().getTitulo());
             context.setVariable("dataExcursao", inscricao.getExcursao().getDataSaida());
             context.setVariable("valorPago", inscricao.getValorPago());
@@ -41,12 +40,11 @@ public class EmailService {
             String htmlContent = templateEngine.process("email/confirmacao-inscricao", context);
 
             enviarEmail(
-                    inscricao.getCliente().getEmail(),
+                    inscricao.getUser().getEmail(), // AJUSTADO
                     "Confirmação de Inscrição - " + inscricao.getExcursao().getTitulo(),
                     htmlContent
             );
         } catch (Exception e) {
-            // Log error but don't throw - email failure shouldn't break the flow
             System.err.println("Erro ao enviar email de confirmação de inscrição: " + e.getMessage());
         }
     }
@@ -55,7 +53,7 @@ public class EmailService {
     public void enviarConfirmacaoPagamento(Inscricao inscricao) {
         try {
             Context context = new Context();
-            context.setVariable("nomeCliente", inscricao.getCliente().getNome());
+            context.setVariable("nomeCliente", inscricao.getUser().getFullName()); // AJUSTADO
             context.setVariable("tituloExcursao", inscricao.getExcursao().getTitulo());
             context.setVariable("dataExcursao", inscricao.getExcursao().getDataSaida());
             context.setVariable("valorPago", inscricao.getValorPago());
@@ -63,7 +61,7 @@ public class EmailService {
             String htmlContent = templateEngine.process("email/confirmacao-pagamento", context);
 
             enviarEmail(
-                    inscricao.getCliente().getEmail(),
+                    inscricao.getUser().getEmail(), // AJUSTADO
                     "Pagamento Confirmado - " + inscricao.getExcursao().getTitulo(),
                     htmlContent
             );
@@ -78,7 +76,7 @@ public class EmailService {
             Context context = new Context();
             context.setVariable("titulo", notificacao.getTitulo());
             context.setVariable("mensagem", notificacao.getMensagem());
-            context.setVariable("nomeOrganizador", "TODO notificacao.getOrganizador().getNomeEmpresa()"); //TODO resolver com a Claude
+            context.setVariable("nomeOrganizador", notificacao.getCompania().getNomeEmpresa()); // AJUSTADO
 
             String htmlContent = templateEngine.process("email/notificacao-personalizada", context);
 
